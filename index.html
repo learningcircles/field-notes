@@ -616,7 +616,7 @@ main {
   background: var(--white);
   border-radius: 4px;
   border-left: 5px solid var(--lichen);
-  padding: 1.35rem 1.5rem 1rem 1.5rem;
+  padding: 1.35rem 1.5rem 1rem 3.25rem;
   margin-bottom: 1rem;
   box-shadow: 0 1px 6px rgba(46,74,46,0.07);
   position: relative;
@@ -705,6 +705,30 @@ main {
   margin-bottom: 0.9rem;
 }
 
+/* ── CHECKBOX (restored) ──────────────────────────────── */
+.rc-checkbox {
+  position: absolute;
+  left: 1.1rem; top: 1.35rem;
+  width: 1.1rem; height: 1.1rem;
+  accent-color: var(--forest);
+  cursor: pointer;
+}
+
+/* ── SELECT ALL ───────────────────────────────────────── */
+.select-all-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.82rem;
+  color: #8a7a62;
+  cursor: pointer;
+  user-select: none;
+  font-style: italic;
+}
+
+.select-all-row input { accent-color: var(--forest); cursor: pointer; }
+
 /* ── INLINE CARD ACTIONS ──────────────────────────────── */
 .card-actions {
   display: flex;
@@ -747,17 +771,18 @@ main {
 
 .ca-discard {
   background: none;
-  color: #c0a090;
-  border: none;
-  padding: 0.38rem 0.5rem;
+  color: #9a7a72;
+  border: 1.5px solid #d4b8b0;
+  border-radius: 3px;
+  padding: 0.38rem 0.75rem;
   font-family: 'Spectral', serif;
   font-size: 0.8rem;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
   font-style: italic;
   margin-left: auto;
 }
-.ca-discard:hover { color: var(--cranberry); }
+.ca-discard:hover { color: var(--cranberry); border-color: var(--cranberry); background: #fdf5f5; }
 
 /* ── INLINE EDIT AREA ─────────────────────────────────── */
 .inline-edit-wrap {
@@ -1411,8 +1436,10 @@ footer a:hover { text-decoration: underline; }
     <!-- Copy toolbar -->
     <div class="copy-toolbar" id="copyToolbar">
       <div class="toolbar-inner">
-        <span class="toolbar-count" id="toolbarCount"></span>
-        <button class="t-btn primary" onclick="addAllToSaved()">+ Add All to Portfolio</button>
+        <span class="toolbar-count" id="toolbarCount">None selected</span>
+        <button class="t-btn primary" onclick="saveSelected()">+ Save Selected</button>
+        <button class="t-btn" onclick="saveAll()">+ Save All</button>
+        <button class="t-btn" onclick="copySelected()">Copy Selected</button>
         <button class="t-btn" onclick="copyAllResults()">Copy All</button>
         <button class="t-btn" onclick="clearResults()">Clear</button>
       </div>
@@ -1766,7 +1793,7 @@ RULES: Only genuine connections. Never echo raw misspelled input. Return only va
     }
     userContent.push({ type: 'text', text: prompt });
 
-    const resp = await fetch("/.netlify/functions/claude", {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2500, messages: [{ role: "user", content: userContent }] })
@@ -1793,9 +1820,11 @@ function renderCards(results, cleanedActivity, rawInput, frameworkName) {
   const showCorrection = cleanedActivity.toLowerCase().trim() !== rawInput.toLowerCase().trim();
   const correction = showCorrection ? `<div class="correction-note">✏️ Recorded as: <strong>"${cleanedActivity}"</strong></div>` : '';
   const fwLabel = `<div style="font-size:0.76rem;color:#8a7a62;font-style:italic;margin-bottom:0.85rem;">Framework: ${frameworkName}</div>`;
+  const selectId = 'sa' + Date.now();
   const cards = results.map(e => {
     const k = e.subject || 'science';
-    return `<div class="result-card ${k}" id="${e._id}">
+    return `<div class="result-card ${k}" id="${e._id}" onclick="toggleCard('${e._id}')">
+      <input type="checkbox" class="rc-checkbox" id="chk-${e._id}" onchange="updateToolbar()" onclick="event.stopPropagation()">
       <span class="subject-tag ${k}">${S[k]?.icon || ''} ${e.subjectLabel || S[k]?.label}</span>
       <div class="rc-activity">${cleanedActivity}</div>
       <div class="field-note standard"><strong>Standard:</strong> ${e.standard || ''}</div>
@@ -1806,20 +1835,20 @@ function renderCards(results, cleanedActivity, rawInput, frameworkName) {
       <div class="inline-edit-wrap" id="edit-${e._id}">
         <textarea id="edit-ta-${e._id}">${(e.portfolioEntry || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
         <div class="inline-edit-actions">
-          <button class="ca-commit" onclick="commitEdit('${e._id}')">✓ Add to Portfolio</button>
+          <button class="ca-commit" onclick="commitEdit('${e._id}')">✓ Save to Portfolio</button>
           <button class="ca-cancel" onclick="closeEdit('${e._id}')">Cancel</button>
         </div>
       </div>
 
       <!-- Card action row -->
       <div class="card-actions">
-        <button class="ca-add" id="cadd-${e._id}" onclick="directAdd('${e._id}')">+ Add to Portfolio</button>
-        <button class="ca-edit" onclick="openEdit('${e._id}')">Edit then Add</button>
+        <button class="ca-add" id="cadd-${e._id}" onclick="directAdd('${e._id}')">+ Save to Portfolio</button>
+        <button class="ca-edit" onclick="openEdit('${e._id}')">Edit Entry</button>
         <button class="ca-discard" onclick="discardCard('${e._id}')">Discard</button>
       </div>
     </div>`;
   }).join('');
-  document.getElementById('mapperResults').innerHTML = `${correction}${fwLabel}${cards}`;
+  document.getElementById('mapperResults').innerHTML = `${correction}${fwLabel}<label class="select-all-row"><input type="checkbox" id="${selectId}" onchange="toggleSelectAll(this)"> Select all ${results.length} result${results.length !== 1 ? 's' : ''}</label>${cards}`;
   updateToolbar();
 }
 
@@ -1830,7 +1859,7 @@ function directAdd(id) {
   if (!entry) return;
   saveToPad(entry.subject, entry);
   const addBtn = document.getElementById('cadd-' + id);
-  if (addBtn) { addBtn.textContent = '✅ Added'; addBtn.disabled = true; }
+  if (addBtn) { addBtn.textContent = '✅ Saved'; addBtn.disabled = true; }
   const card = document.getElementById(id);
   if (card) {
     card.classList.add('added-flash');
@@ -1870,7 +1899,7 @@ function commitEdit(id) {
   saveToPad(entry.subject, edited);
   closeEdit(id);
   const addBtn = document.getElementById('cadd-' + id);
-  if (addBtn) { addBtn.textContent = '✅ Added'; addBtn.disabled = true; }
+  if (addBtn) { addBtn.textContent = '✅ Saved'; addBtn.disabled = true; }
   const card = document.getElementById(id);
   if (card) {
     card.classList.add('added-flash');
@@ -1890,10 +1919,33 @@ function discardCard(id) {
   }, 240);
 }
 
+function toggleCard(id) {
+  const chk = document.getElementById('chk-' + id);
+  if (chk) { chk.checked = !chk.checked; updateToolbar(); }
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle('selected', chk?.checked);
+}
+
+function toggleSelectAll(master) {
+  currentResults.forEach(e => {
+    const chk = document.getElementById('chk-' + e._id);
+    const card = document.getElementById(e._id);
+    if (chk) chk.checked = master.checked;
+    if (card) card.classList.toggle('selected', master.checked);
+  });
+  updateToolbar();
+}
+
 function updateToolbar() {
+  currentResults.forEach(e => {
+    const chk = document.getElementById('chk-' + e._id);
+    const card = document.getElementById(e._id);
+    if (chk && card) card.classList.toggle('selected', chk.checked);
+  });
+  const count = currentResults.filter(e => document.getElementById('chk-' + e._id)?.checked).length;
   if (currentResults.length > 0) {
     document.getElementById('copyToolbar').classList.add('visible');
-    document.getElementById('toolbarCount').textContent = `${currentResults.length} result${currentResults.length !== 1 ? 's' : ''}`;
+    document.getElementById('toolbarCount').textContent = count === 0 ? 'None selected' : `${count} selected`;
   } else {
     hideToolbar();
   }
@@ -1918,14 +1970,33 @@ function copyAllResults() {
   navigator.clipboard.writeText(currentResults.map(entryToText).join('\n\n\u2014\n\n')).then(() => flashCount('✅ All copied!'));
 }
 
-function addAllToSaved() {
+function getSelected() { return currentResults.filter(e => document.getElementById('chk-' + e._id)?.checked); }
+
+function copySelected() {
+  const sel = getSelected();
+  if (!sel.length) { flashCount('Nothing selected'); return; }
+  navigator.clipboard.writeText(sel.map(entryToText).join('\n\n\u2014\n\n')).then(() => flashCount('✅ Copied!'));
+}
+
+function saveSelected() {
+  const sel = getSelected();
+  if (!sel.length) { flashCount('Nothing selected'); return; }
+  sel.forEach(e => {
+    saveToPad(e.subject, e);
+    const addBtn = document.getElementById('cadd-' + e._id);
+    if (addBtn) { addBtn.textContent = '✅ Saved'; addBtn.disabled = true; }
+  });
+  flashCount(`✅ ${sel.length} saved`);
+}
+
+function saveAll() {
   if (!currentResults.length) return;
   currentResults.forEach(e => {
     saveToPad(e.subject, e);
     const addBtn = document.getElementById('cadd-' + e._id);
-    if (addBtn) { addBtn.textContent = '✅ Added'; addBtn.disabled = true; }
+    if (addBtn) { addBtn.textContent = '✅ Saved'; addBtn.disabled = true; }
   });
-  flashCount('✅ All added');
+  flashCount('✅ All saved');
 }
 
 function flashCount(msg) {
