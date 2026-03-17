@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Notes — Learning Circles Portfolio Builder</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e4a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Field Notes">
+<link rel="apple-touch-icon" href="LC_Green_Logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --parchment:   #f4ede0;
+  --paper:       #faf6ef;
+  --forest:      #2e4a2e;
+  --forest-mid:  #3d6140;
+  --bark:        #5c3d1e;
+  --mushroom:    #b8861b;
+  --lichen:      #7a9c6e;
+  --lichen-soft: #c8dbbf;
+  --cranberry:   #6b2535;
+  --aspen:       #8aab5a;
+  --ink:         #1e2419;
+  --ink-mid:     #3a3a2e;
+  --fog:         #e8e0d0;
+  --fog-dark:    #d4c9b4;
+  --white:       #fffdf8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+header {
+  background: var(--forest);
+  color: var(--parchment);
+  position: relative;
+  overflow: hidden;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 5px;
+  background: var(--mushroom);
+}
+
+.header-inner {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 3rem 2.25rem 2.5rem;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1.5rem;
+}
+
+.header-eyebrow {
+  font-family: 'Spectral', serif;
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 0.4rem;
+}
+
+header h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+  font-weight: 600;
+  line-height: 1.0;
+  letter-spacing: 0.5px;
+  font-style: normal;
+}
+
+header h1 span {
+  font-style: normal;
+  font-size: 0.55em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  display: block;
+  margin-top: 0.3rem;
+  font-family: 'Spectral', serif;
+  font-weight: 300;
+}
+
+.header-sub {
+  font-size: 0.92rem;
+  opacity: 0.68;
+  font-style: italic;
+  margin-top: 0.65rem;
+  font-weight: 300;
+  font-family: 'Spectral', serif;
+  max-width: 480px;
+}
+
+/* ── MAINE MARK ───────────────────────────────────────── */
+.maine-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: rgba(244,237,224,0.75);
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.maine-mark:hover { color: var(--parchment); }
+
+.maine-tree {
+  width: 30px;
+  height: 32px;
+  flex-shrink: 0;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+.maine-mark:hover .maine-tree { opacity: 1; }
+
+.maine-mark-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  line-height: 1.3;
+}
+
+.maine-mark-text strong {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--mushroom);
+}
+
+.maine-mark-text em {
+  font-size: 0.7rem;
+  font-style: italic;
+  opacity: 0.65;
+  font-family: 'Spectral', serif;
+  font-weight: 300;
+}
+
+/* ── LAYOUT ───────────────────────────────────────────── */
+main {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 2.75rem 2.25rem 7rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SECTION LABELS ───────────────────────────────────── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.4rem;
+  margin-top: 2.5rem;
+}
+
+.section-label:first-child { margin-top: 0; }
+
+.section-label h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--bark);
+  letter-spacing: 0.3px;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--mushroom);
+  flex-shrink: 0;
+}
+
+/* ── CARDS ────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: 4px;
+  padding: 2rem 2.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 0 var(--fog-dark), 0 3px 16px rgba(46,74,46,0.07);
+}
+
+.card-hint {
+  font-size: 0.85rem;
+  color: #8a7a62;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  line-height: 1.65;
+}
+
+/* ── FRAMEWORK SELECTOR ───────────────────────────────── */
+.framework-row {
+  background: var(--fog);
+  border-radius: 3px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  border: 1px solid var(--fog-dark);
+}
+
+.framework-row label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8a7a62;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.framework-row select {
+  border: 1px solid var(--fog-dark);
+  border-radius: 3px;
+  padding: 0.42rem 0.7rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.86rem;
+  background: var(--white);
+  color: var(--ink-mid);
+  flex: 1;
+  min-width: 200px;
+  cursor: pointer;
+}
+
+.framework-row select:focus {
+  outline: none;
+  border-color: var(--forest-mid);
+  box-shadow: 0 0 0 2px rgba(61,97,64,0.1);
+}
+
+.framework-note {
+  font-size: 0.75rem;
+  color: #a09080;
+  font-style: italic;
+  flex-basis: 100%;
+  padding-top: 0;
+}
+
+/* ── INPUTS ───────────────────────────────────────────── */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.field { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--bark);
+}
+
+.field input,
+.field select,
+.field textarea {
+  border: 1.5px solid var(--fog-dark);
+  border-radius: 3px;
+  padding: 0.6rem 0.85rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.93rem;
+  color: var(--ink);
+  background: var(--paper);
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--forest-mid);
+  box-shadow: 0 0 0 3px rgba(61,97,64,0.1);
+  background: var(--white);
+}
+
+.field textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
+
+/* ── ACTIVITY INPUT ───────────────────────────────────── */
+.activity-wrap { margin-bottom: 1.25rem; }
+
+.activity-row {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-end;
+}
+
+.activity-row textarea {
+  flex: 1;
+  border: 2.5px solid var(--fog-dark);
+  border-radius: 3px;
+  padding: 1rem 1.1rem;
+  font-family: 'Spectral', serif;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: var(--white);
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.6;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(46,74,46,0.06);
+}
+
+.activity-row textarea:focus {
+  outline: none;
+  border-color: var(--forest-mid);
+  box-shadow: 0 0 0 3px rgba(61,97,64,0.1), 0 2px 8px rgba(46,74,46,0.08);
+  background: var(--white);
+}
+
+.activity-row textarea::placeholder { color: #b8a88a; font-style: italic; }
+
+/* ── INPUT TOOLS ROW ──────────────────────────────────── */
+.input-tools-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* ── VOICE BUTTON ─────────────────────────────────────── */
+.voice-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: none;
+  border: 1.5px solid var(--fog-dark);
+  border-radius: 20px;
+  padding: 0.38rem 0.9rem 0.38rem 0.7rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.82rem;
+  color: #8a7a62;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  font-style: italic;
+}
+
+.voice-trigger:hover {
+  border-color: var(--forest-mid);
+  color: var(--forest);
+  background: var(--paper);
+}
+
+.voice-trigger.listening {
+  border-color: var(--cranberry);
+  color: var(--cranberry);
+  background: #fff5f5;
+  animation: pulse-ring 1.2s ease-out infinite;
+  font-style: normal;
+}
+
+.voice-trigger svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(107,37,53,0.3); }
+  70%  { box-shadow: 0 0 0 8px rgba(107,37,53,0); }
+  100% { box-shadow: 0 0 0 0 rgba(107,37,53,0); }
+}
+
+.voice-status {
+  font-size: 0.76rem;
+  color: var(--lichen);
+  font-style: italic;
+  margin-top: 0.35rem;
+  min-height: 1.1em;
+  display: none;
+}
+
+.voice-status.visible { display: block; }
+.voice-status.error { color: var(--cranberry); }
+
+/* ── PHOTO BUTTON ─────────────────────────────────────── */
+.photo-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: none;
+  border: 1.5px solid var(--fog-dark);
+  border-radius: 20px;
+  padding: 0.38rem 0.9rem 0.38rem 0.7rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.82rem;
+  color: #8a7a62;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  font-style: italic;
+}
+
+.photo-trigger:hover {
+  border-color: var(--forest-mid);
+  color: var(--forest);
+  background: var(--paper);
+}
+
+.photo-trigger svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* ── PHOTO PREVIEWS ───────────────────────────────────── */
+.photo-previews {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.photo-thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid var(--fog-dark);
+  flex-shrink: 0;
+  animation: entryIn 0.2s ease;
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.55);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.photo-remove:hover { background: var(--cranberry); }
+
+/* ── META / FOCUS ROWS ────────────────────────────────── */
+.meta-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.meta-row label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--bark);
+}
+
+.meta-row select,
+.meta-row input {
+  border: 1.5px solid var(--fog-dark);
+  border-radius: 3px;
+  padding: 0.48rem 0.75rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.9rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.meta-row select:focus, .meta-row input:focus {
+  outline: none; border-color: var(--forest-mid);
+}
+
+.focus-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.focus-row label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--bark);
+  white-space: nowrap;
+}
+
+.focus-row select {
+  border: 1.5px solid var(--fog-dark);
+  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.9rem;
+  background: var(--paper);
+  color: var(--ink);
+  flex: 1;
+  min-width: 160px;
+}
+
+.focus-row select:focus { outline: none; border-color: var(--forest-mid); }
+.focus-note { font-size: 0.78rem; color: #9a8a72; font-style: italic; flex-basis: 100%; }
+
+/* ── BUTTONS ──────────────────────────────────────────── */
+.btn-primary {
+  background: var(--forest);
+  color: var(--parchment);
+  border: none;
+  border-radius: 3px;
+  padding: 0.75rem 1.6rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.97rem;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.1s;
+  white-space: nowrap;
+  align-self: flex-end;
+  letter-spacing: 0.2px;
+}
+
+.btn-primary:hover { background: var(--forest-mid); transform: translateY(-1px); }
+.btn-primary:active { transform: none; }
+.btn-primary:disabled { background: var(--fog-dark); cursor: not-allowed; transform: none; }
+
+.btn-primary.has-photos {
+  background: var(--mushroom);
+  box-shadow: 0 0 0 2px rgba(184,134,27,0.15);
+}
+
+.btn-primary.has-photos:hover { background: #a07218; }
+
+.btn-rust {
+  background: var(--cranberry);
+  color: var(--parchment);
+  border: none; border-radius: 3px;
+  padding: 0.6rem 1.15rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.87rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-rust:hover { background: #572030; }
+
+.btn-ghost {
+  background: none;
+  color: #aaa;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 0.55rem 0.9rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.btn-ghost:hover { color: var(--cranberry); border-color: var(--cranberry); }
+
+/* ── RESULT CARDS ─────────────────────────────────────── */
+.result-card {
+  background: var(--white);
+  border-radius: 4px;
+  border-left: 5px solid var(--lichen);
+  padding: 1.35rem 1.5rem 1rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 6px rgba(46,74,46,0.07);
+  position: relative;
+  transition: box-shadow 0.15s, background 0.15s;
+  animation: entryIn 0.28s ease;
+}
+
+@keyframes entryIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.result-card.selected {
+  background: #f3f8f1;
+  box-shadow: 0 0 0 2px var(--lichen), 0 3px 10px rgba(46,74,46,0.1);
+}
+
+.result-card.science  { border-left-color: #3a7a6e; }
+.result-card.math     { border-left-color: #4a6ea8; }
+.result-card.ela      { border-left-color: #7a4a9c; }
+.result-card.social   { border-left-color: #b58a1e; }
+.result-card.pe       { border-left-color: var(--aspen); }
+.result-card.health   { border-left-color: var(--cranberry); }
+.result-card.arts     { border-left-color: #b06020; }
+.result-card.library  { border-left-color: #2a6a8a; }
+.result-card.maine    { border-left-color: var(--bark); }
+.result-card.computer { border-left-color: #3a4a8a; }
+
+.subject-tag {
+  display: inline-block;
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--lichen);
+  border-radius: 2px;
+  padding: 0.16rem 0.5rem;
+  margin-bottom: 0.55rem;
+  font-family: 'Spectral', serif;
+}
+
+.subject-tag.science  { background: #3a7a6e; }
+.subject-tag.math     { background: #4a6ea8; }
+.subject-tag.ela      { background: #7a4a9c; }
+.subject-tag.social   { background: #b58a1e; }
+.subject-tag.pe       { background: var(--aspen); }
+.subject-tag.health   { background: var(--cranberry); }
+.subject-tag.arts     { background: #b06020; }
+.subject-tag.library  { background: #2a6a8a; }
+.subject-tag.maine    { background: var(--bark); }
+.subject-tag.computer { background: #3a4a8a; }
+
+.rc-activity {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.55rem;
+  font-style: italic;
+}
+
+.field-note {
+  border-radius: 3px;
+  padding: 0.42rem 0.75rem;
+  margin-bottom: 0.42rem;
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+.field-note.standard { background: var(--lichen-soft); }
+.field-note.conn     { background: var(--fog); }
+
+.field-note strong {
+  font-size: 0.7rem;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--forest);
+  font-style: normal;
+}
+
+.narrative {
+  font-size: 0.94rem;
+  line-height: 1.82;
+  color: var(--ink-mid);
+  margin-top: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+/* ── INLINE CARD ACTIONS ──────────────────────────────── */
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--fog-dark);
+  flex-wrap: wrap;
+}
+
+.ca-add {
+  background: var(--forest);
+  color: var(--parchment);
+  border: none;
+  border-radius: 3px;
+  padding: 0.38rem 0.9rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.ca-add:hover { background: var(--forest-mid); transform: translateY(-1px); }
+.ca-add:active { transform: none; }
+.ca-add:disabled { background: var(--lichen); cursor: default; transform: none; opacity: 0.8; }
+
+.ca-edit {
+  background: none;
+  color: var(--bark);
+  border: 1.5px solid var(--fog-dark);
+  border-radius: 3px;
+  padding: 0.38rem 0.9rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-style: italic;
+}
+.ca-edit:hover { border-color: var(--bark); background: var(--fog); }
+
+.ca-discard {
+  background: none;
+  color: #c0a090;
+  border: none;
+  padding: 0.38rem 0.5rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.15s;
+  font-style: italic;
+  margin-left: auto;
+}
+.ca-discard:hover { color: var(--cranberry); }
+
+/* ── INLINE EDIT AREA ─────────────────────────────────── */
+.inline-edit-wrap {
+  display: none;
+  margin-top: 0.75rem;
+  animation: entryIn 0.18s ease;
+}
+.inline-edit-wrap.open { display: block; }
+
+.inline-edit-wrap textarea {
+  width: 100%;
+  border: 1.5px solid var(--forest-mid);
+  border-radius: 3px;
+  padding: 0.75rem 0.9rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.92rem;
+  color: var(--ink);
+  background: #f8fdf6;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.65;
+  transition: box-shadow 0.15s;
+}
+.inline-edit-wrap textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(61,97,64,0.12);
+}
+
+.inline-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+.ca-commit {
+  background: var(--forest);
+  color: var(--parchment);
+  border: none;
+  border-radius: 3px;
+  padding: 0.38rem 0.9rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ca-commit:hover { background: var(--forest-mid); }
+
+.ca-cancel {
+  background: none;
+  color: #999;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 0.38rem 0.75rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.ca-cancel:hover { color: var(--cranberry); border-color: var(--cranberry); }
+
+/* flash when added */
+.result-card.added-flash {
+  background: #f0f7ee;
+  box-shadow: 0 0 0 2px var(--lichen), 0 3px 12px rgba(46,74,46,0.1);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.result-card.discarded {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
+}
+
+/* ── CORRECTION NOTE ──────────────────────────────────── */
+.correction-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fef8ed;
+  border: 1px solid #e8d5a0;
+  border-radius: 3px;
+  padding: 0.4rem 0.8rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.82rem;
+  color: var(--bark);
+  font-style: italic;
+}
+
+.correction-note strong { color: var(--mushroom); font-style: normal; }
+
+/* ── COPY TOOLBAR ─────────────────────────────────────── */
+.copy-toolbar {
+  display: none;
+  position: sticky;
+  bottom: 1.5rem;
+  z-index: 100;
+  margin-top: 1.25rem;
+}
+
+.copy-toolbar.visible { display: flex; }
+
+.toolbar-inner {
+  background: var(--forest);
+  color: var(--parchment);
+  border-radius: 4px;
+  padding: 0.8rem 1.25rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.toolbar-count {
+  font-size: 0.8rem;
+  opacity: 0.65;
+  font-style: italic;
+  margin-right: 0.35rem;
+  white-space: nowrap;
+  font-family: 'Spectral', serif;
+}
+
+.t-btn {
+  background: rgba(255,255,255,0.1);
+  color: var(--parchment);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 3px;
+  padding: 0.4rem 0.85rem;
+  font-family: 'Spectral', serif;
+  font-size: 0.83rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.t-btn:hover { background: rgba(255,255,255,0.22); }
+
+.t-btn.primary {
+  background: var(--white);
+  color: var(--forest);
+  font-weight: 600;
+  border-color: var(--white);
+}
+
+.t-btn.primary:hover { background: var(--parchment); }
+
+/* ── EMPTY STATE ──────────────────────────────────────── */
+.empty-state {
+  margin-top: 1.5rem;
+  transition: opacity 0.3s;
+}
+
+.empty-state.hidden { display: none; }
+
+.empty-hint {
+  font-size: 0.82rem;
+  color: #b0a08a;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-family: 'Spectral', serif;
+}
+
+.ghost-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  opacity: 0.38;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ghost-card {
+  background: var(--white);
+  border-radius: 4px;
+  border-left: 5px solid var(--fog-dark);
+  padding: 1rem 1.25rem 1rem 2.75rem;
+  box-shadow: 0 1px 4px rgba(46,74,46,0.04);
+}
+
+.ghost-tag {
+  width: 80px;
+  height: 16px;
+  background: var(--fog-dark);
+  border-radius: 2px;
+  margin-bottom: 0.65rem;
+}
+
+.ghost-line {
+  height: 10px;
+  background: var(--fog-dark);
+  border-radius: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.ghost-line.long   { width: 90%; }
+.ghost-line.medium { width: 65%; }
+.ghost-line.short  { width: 40%; }
+
+/* ── RESULTS HEADER ───────────────────────────────────── */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.results-hint {
+  font-size: 0.78rem;
+  color: #9a8a72;
+  font-style: italic;
+  font-family: 'Spectral', serif;
+}
+
+.results-clear {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.76rem;
+}
+
+/* ── LOADING / ERROR ──────────────────────────────────── */
+.loading {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--lichen);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid var(--fog-dark);
+  border-top-color: var(--forest);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-note {
+  background: #fdf0f0;
+  border: 1px solid #d4a0a0;
+  border-radius: 3px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9rem;
+  color: #7a2020;
+}
+
+/* ── HOW IT WORKS ─────────────────────────────────────── */
+.how-strip {
+  background: var(--white);
+  border-radius: 4px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 1px 6px rgba(46,74,46,0.06);
+  border-top: 3px solid var(--mushroom);
+  margin-top: 0.5rem;
+}
+
+.how-strip h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  color: var(--bark);
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.3px;
+}
+
+.how-steps {
+  display: flex;
+  gap: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.how-step {
+  font-size: 0.88rem;
+  color: var(--ink-mid);
+  font-style: italic;
+}
+
+.how-arrow {
+  color: var(--mushroom);
+  font-size: 0.85rem;
+  font-style: normal;
+  opacity: 0.8;
+}
+
+/* ── SAVED PAD ────────────────────────────────────────── */
+.saved-pad {
+  margin-top: 2.25rem;
+  border-top: 2px solid var(--fog-dark);
+  padding-top: 1.75rem;
+  display: none;
+}
+
+.saved-pad.visible { display: block; }
+
+.saved-pad h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: var(--bark);
+  margin-bottom: 0.3rem;
+}
+
+.pad-sub {
+  font-size: 0.8rem;
+  color: #9a8a72;
+  font-style: italic;
+  margin-bottom: 1.1rem;
+}
+
+.pad-action-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.1rem;
+  align-items: center;
+}
+
+.saved-entry {
+  background: var(--white);
+  border: 1px solid var(--fog-dark);
+  border-radius: 3px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.65rem;
+}
+
+.saved-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.saved-activity {
+  font-size: 0.78rem;
+  color: #9a8a72;
+  font-style: italic;
+  margin-bottom: 0.3rem;
+}
+
+.saved-text { font-size: 0.91rem; line-height: 1.72; color: var(--ink-mid); }
+
+.entry-btns { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+.copy-chip {
+  background: var(--fog);
+  border: 1px solid var(--fog-dark);
+  border-radius: 2px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: 'Spectral', serif;
+  color: var(--bark);
+  transition: background 0.12s;
+}
+
+.copy-chip:hover { background: var(--fog-dark); }
+.copy-chip.done { background: var(--lichen); color: white; border-color: var(--lichen); }
+
+.remove-btn {
+  background: none; border: none;
+  color: #ccc; cursor: pointer;
+  font-size: 0.9rem; padding: 0.1rem 0.25rem;
+  transition: color 0.12s;
+}
+
+.remove-btn:hover { color: var(--cranberry); }
+
+.saved-standard {
+  font-size: 0.75rem;
+  color: var(--forest-mid);
+  font-style: italic;
+  margin-bottom: 0.3rem;
+  padding: 0.2rem 0;
+}
+
+.standard-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.standard-toggle input {
+  accent-color: var(--forest);
+  cursor: pointer;
+  width: 13px;
+  height: 13px;
+}
+
+.standard-toggle span {
+  font-size: 0.74rem;
+  color: #a09080;
+  font-style: italic;
+  font-family: 'Spectral', serif;
+}
+
+/* ── ABOUT STRIP ──────────────────────────────────────── */
+.about-strip {
+  margin-top: 1.5rem;
+  padding: 1.1rem 0 0.5rem;
+  border-top: 1px solid var(--fog-dark);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.lc-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.about-strip-text {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.about-strip-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.88rem;
+  color: var(--bark);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.about-strip-sub {
+  font-size: 0.8rem;
+  color: #8a7a62;
+  font-style: normal;
+  font-family: 'Spectral', serif;
+  line-height: 1.55;
+}
+
+.about-strip-sub a.support-link {
+  color: var(--mushroom);
+  font-style: normal;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1.5px solid var(--mushroom);
+  padding-bottom: 1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.about-strip-sub a.support-link:hover {
+  color: #a07218;
+  border-color: #a07218;
+}
+
+.about-strip-sub a.about-link {
+  color: var(--forest-mid);
+  font-style: normal;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(61,97,64,0.3);
+  padding-bottom: 1px;
+  transition: color 0.15s;
+}
+
+.about-strip-sub a.about-link:hover { color: var(--forest); }
+
+/* ── MAINE RESOURCE STRIP ─────────────────────────────── */
+.maine-strip {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--fog-dark);
+  padding-top: 0.75rem;
+}
+
+.maine-strip-inner {
+  font-size: 0.78rem;
+  color: #8a7a62;
+  font-style: italic;
+  line-height: 1.5;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.maine-strip-label {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--bark);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.maine-strip-inner a {
+  color: var(--forest-mid);
+  white-space: nowrap;
+  font-style: italic;
+}
+
+.maine-strip-inner a:hover { text-decoration: underline; }
+
+/* ── GRADE NOTE ───────────────────────────────────────── */
+
+/* ── FOOTER ───────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 2.25rem 1rem 3.5rem;
+  font-size: 0.77rem;
+  color: #9a8a72;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+
+footer a { color: var(--forest-mid); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .header-inner { grid-template-columns: 1fr; padding: 2rem 1.25rem 1.75rem; }
+  .maine-badge { display: none; }
+  main { padding: 1.75rem 1.25rem 6rem; }
+  .card { padding: 1.4rem 1.25rem; }
+  .activity-row { flex-direction: column; }
+  .btn-primary { align-self: stretch; text-align: center; }
+  .how-steps { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+  .how-arrow { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <div class="header-wordmark">
+      <div class="header-eyebrow">Learning Circles</div>
+      <h1>Field Notes
+        <span>Portfolio Builder</span>
+      </h1>
+      <p class="header-sub">Real life is the curriculum. We help you document it.</p>
+    </div>
+    <a href="https://legislature.maine.gov/statutes/20-A/title20-Asec5001-A.html" target="_blank" rel="noopener" class="maine-mark">
+      <svg viewBox="316 329 400 435" xmlns="http://www.w3.org/2000/svg" class="maine-tree"><path d="M0 0 C4.10640937 2.1321741 5.47541385 3.50928413 7.01171875 7.875 C7.64186958 10.1297169 8.26531211 12.386317 8.8828125 14.64453125 C10.62194815 19.8680191 13.51184797 23.7963296 17 28 C17.75023437 28.93585938 17.75023437 28.93585938 18.515625 29.890625 C26.5382396 38.88567774 37.94005198 43.54570203 49.40185547 46.27783203 C52.4915653 47.04935224 54.64260542 47.65470843 56.9609375 49.89453125 C58.5947413 53.20513369 58.65740577 56.43728488 58 60 C56.20636089 62.8100346 54.98119065 64.50940468 52 66 C41.9213396 66.9332093 32.69754164 62.74733434 24 58 C23.29488281 57.65453125 22.58976563 57.3090625 21.86328125 56.953125 C12.5220411 52.19284206 4.15136288 44.49376927 -2 36 C-2 35.34 -2 34.68 -2 34 C-5.49605027 35.43642065 -7.08022506 37.12769602 -9.25 40.1875 C-18.24314086 52.07061425 -31.09216702 59.08469095 -45 64 C-45.66 64 -46.32 64 -47 64 C-39.23806795 72.3886719 -25.96381705 74.79507787 -15.44750977 78.1809082 C-13.16374932 78.94519911 -10.92145575 79.77565496 -8.67578125 80.64453125 C-5.66056849 81.75641098 -2.96352633 82.53304533 0.1875 83.0625 C2.70976456 83.49034778 4.84048947 83.9299293 7.1875 84.9609375 C11.29906026 86.4799306 15.48402513 86.96052667 19.8125 87.5625 C20.67681641 87.68818359 21.54113281 87.81386719 22.43164062 87.94335938 C24.953176 88.30684108 27.47497401 88.6615563 30 89 C31.2691626 89.17490967 32.5383252 89.34981934 33.84594727 89.5300293 C40.57487013 90.3618542 47.3549619 90.24042701 54.125 90.25 C55.25284409 90.25350464 55.25284409 90.25350464 56.4034729 90.25708008 C67.67757591 90.27027265 78.56554062 89.55431782 89.69921875 87.65625 C95.1977274 86.74758535 99.47834923 86.11467592 104.4375 89 C107.31340469 92.3669128 107.65280011 93.70185767 107.6015625 97.9375 C105.65380557 104.61552374 99.3561741 107.55205609 93.75 110.8125 C92.85829102 111.33803467 91.96658203 111.86356934 91.04785156 112.4050293 C83.20402107 116.97873017 75.2298729 121.16870843 67 125 C66.35643555 125.30244629 65.71287109 125.60489258 65.04980469 125.91650391 C48.5900948 133.58978984 31.48097253 139.07024193 13.63671875 142.4609375 C10.5264729 143.09680998 7.45739085 143.86593022 4.375 144.625 C-0.58973746 145.79421036 -4.91802936 146.29893945 -10 146 C-10 146.66 -10 147.32 -10 148 C-19.10179517 148.94358255 -28.10452203 149.12224433 -37.25 149.0625 C-38.59244622 149.05746786 -39.9348943 149.05290802 -41.27734375 149.04882812 C-44.5182781 149.03717009 -47.75911369 149.02080774 -51 149 C-51 149.66 -51 150.32 -51 151 C-50.29367432 151.12906738 -49.58734863 151.25813477 -48.85961914 151.39111328 C-45.91782906 152.01749631 -43.11451512 152.8385891 -40.24609375 153.7421875 C-39.14330078 154.08636719 -38.04050781 154.43054688 -36.90429688 154.78515625 C-34.62021846 155.5031933 -32.33635867 156.22192624 -30.05273438 156.94140625 C-17.82640697 160.75460286 -5.7015952 163.54944661 6.9375 165.625 C8.20529297 165.8415625 9.47308594 166.058125 10.77929688 166.28125 C25.25207994 168.68472602 39.54967414 169.26787092 54.1875 169.3125 C55.07297516 169.31578308 55.95845032 169.31906616 56.87075806 169.32244873 C69.74596998 169.33774836 82.40718449 168.69348925 95.1875 167.125 C95.90360443 167.03795807 96.61970886 166.95091614 97.35751343 166.86123657 C103.82498016 166.0555795 109.83367569 165.14130142 116 163 C119.375 162.375 119.375 162.375 123 162 C123.66386719 161.91105469 124.32773437 161.82210937 125.01171875 161.73046875 C127.92439185 161.49190695 130.29605836 161.58152089 132.83984375 163.09375 C135.88929516 165.7916176 136.90348024 167.49985215 137.6875 171.5625 C136.8157755 175.92112251 135.30005378 177.07967844 132 180 C129.9435925 181.3467453 127.83393188 182.61443285 125.6875 183.8125 C125.0886499 184.14725342 124.4897998 184.48200684 123.87280273 184.8269043 C114.48288366 190.01692909 104.89089804 194.84156867 95 199 C94.28739014 199.30752197 93.57478027 199.61504395 92.84057617 199.93188477 C67.09248784 211.02480793 39.81604788 220.25621095 12.01953125 224.45727539 C9.70469159 224.87334012 7.41073217 225.40699783 5.13232422 225.99047852 C-10.23304493 229.90868166 -26.40432192 229.24982336 -42.125 229.125 C-44.35546468 229.11493971 -46.58593381 229.1058193 -48.81640625 229.09765625 C-54.21103664 229.07590845 -59.60549663 229.04267757 -65 229 C-65 229.66 -65 230.32 -65 231 C-63.9584375 231.15855469 -62.916875 231.31710937 -61.84375 231.48046875 C-53.85379987 232.75893609 -46.35455708 234.41493323 -38.66943359 237.015625 C-29.00642888 240.14072166 -18.91004145 241.67007613 -8.93188477 243.453125 C-6.39615971 243.92610561 -3.89427672 244.47478074 -1.37890625 245.04296875 C6.53781382 246.63534867 14.64707084 247.03928083 22.6875 247.625 C23.57325714 247.6897049 24.45901428 247.75440979 25.37161255 247.82107544 C49.27880559 249.53292733 72.63629873 249.48217429 96.5 247.1875 C97.36527313 247.10490936 98.23054626 247.02231873 99.12203979 246.93722534 C112.6941781 245.6116499 125.90996414 243.57460588 139.0625 239.875 C155.19437939 235.3559719 155.19437939 235.3559719 162.375 237.8125 C164.69855762 239.51048442 165.86663377 241.25034141 166.37109375 244.0859375 C166.39300781 244.84132813 166.41492188 245.59671875 166.4375 246.375 C166.47746094 247.12523437 166.51742188 247.87546875 166.55859375 248.6484375 C165.72987359 252.1371755 163.78645359 253.93083171 161 256 C157.73611043 257.94329414 154.35861248 259.60277572 150.9375 261.25 C149.97030029 261.72381104 149.00310059 262.19762207 148.0065918 262.68579102 C123.09634304 274.80324899 123.09634304 274.80324899 110.6484375 279.0546875 C107.48060874 280.18538744 104.41182752 281.50571952 101.3125 282.8125 C81.99170427 290.74352828 60.55546554 296.27983906 40 300 C38.27523437 300.35191406 38.27523437 300.35191406 36.515625 300.7109375 C25.94255322 302.82137278 15.84395677 303.85853087 5 305 C5 345.59 5 386.18 5 428 C-0.94 428 -6.88 428 -13 428 C-13 388.4 -13 348.8 -13 308 C-33.90992553 308.03937523 -33.90992553 308.03937523 -54.81982422 308.09008789 C-72.81837901 308.12005305 -90.70003799 308.12296007 -108.5625 305.625 C-109.99541382 305.43200317 -109.99541382 305.43200317 -111.45727539 305.23510742 C-120.01378921 304.05620362 -128.51420812 302.60603578 -137 301 C-137 300.34 -137 299.68 -137 299 C-138.7015625 299.0928125 -138.7015625 299.0928125 -140.4375 299.1875 C-144.60784674 299.20218432 -147.83716426 298.15542027 -151.71484375 296.71875 C-154.03760259 295.98817286 -156.07703969 295.73105376 -158.5 295.5625 C-163.41746706 295.13902744 -167.78804821 293.58238059 -172 291 C-174.47253471 287.29119793 -174.6537695 284.29979169 -174 280 C-172.5 277.0625 -172.5 277.0625 -170 275 C-164.22139061 273.82007452 -160.78909654 274.02518716 -155.1875 276.125 C-147.69222429 278.72387834 -140.10681276 280.31126389 -132.3125 281.75 C-130.63933716 282.06541748 -130.63933716 282.06541748 -128.93237305 282.38720703 C-121.30522227 283.75947704 -113.73456107 284.54535311 -106 285 C-106 285.66 -106 286.32 -106 287 C-105.25049072 286.98839844 -104.50098145 286.97679687 -103.72875977 286.96484375 C-97.95828598 286.91394251 -92.33445986 287.07949754 -86.60058594 287.7121582 C-53.85244726 291.25176725 -0.47038436 296.23519218 30 281 C32.0179076 280.72738987 34.03955054 280.48225597 36.0625 280.25 C43.06359057 279.29075037 49.57637071 277.52107496 56.30859375 275.4140625 C62.81064791 273.39539619 69.41644483 271.72907986 76 270 C75.19933105 269.98541748 74.39866211 269.97083496 73.57373047 269.95581055 C51.30520441 269.51069168 29.17515654 268.2501872 6.99749756 266.18560791 C5.20520524 266.01906772 3.41244379 265.85759463 1.61962891 265.69677734 C-15.22393157 264.11829826 -31.42302337 259.99919935 -47.76806641 255.80029297 C-50.50385478 255.12285572 -53.23132753 254.52341436 -56 254 C-56 253.34 -56 252.68 -56 252 C-56.99386719 251.88269531 -57.98773438 251.76539063 -59.01171875 251.64453125 C-63.06997161 251.0621582 -66.91731295 249.94378386 -70.8125 248.6875 C-71.51753662 248.46312256 -72.22257324 248.23874512 -72.94897461 248.00756836 C-77.49728065 246.53944756 -81.95970706 244.94133225 -86.37109375 243.09765625 C-89.10850365 241.9546961 -91.86660684 240.87000774 -94.62792969 239.78637695 C-99.86142583 237.72560787 -105.0137961 235.62405786 -109.98852539 232.98632812 C-112.15624156 231.92338683 -114.35042076 231.07790188 -116.609375 230.2265625 C-121.99917157 228.08996886 -126.93931623 225.42324055 -131.9375 222.5 C-132.77345703 222.02691406 -133.60941406 221.55382812 -134.47070312 221.06640625 C-135.27314453 220.60105469 -136.07558594 220.13570312 -136.90234375 219.65625 C-137.97730103 219.03459961 -137.97730103 219.03459961 -139.07397461 218.40039062 C-141.27270758 216.8017175 -142.5799841 215.31639583 -144 213 C-144.62388198 208.08692938 -144.75777063 206.13665594 -142 202 C-138.15835703 199.43890468 -135.41611404 199.30975024 -131 200 C-128.20195922 200.65654815 -125.43254486 201.39747536 -122.65625 202.140625 C-114.87271029 203.97008946 -106.91473148 204.91043956 -99 206 C-97.93144775 206.15299561 -97.93144775 206.15299561 -96.84130859 206.30908203 C-65.24797417 210.82897083 -32.55984217 210.32522629 -1 206 C0.59642334 205.7831958 0.59642334 205.7831958 2.22509766 205.56201172 C15.9233769 203.63738963 29.11252201 200.63111806 42.38378906 196.75683594 C45.01826094 195.99471735 47.65920985 195.26198316 50.3046875 194.5390625 C51.1395166 194.31081787 51.9743457 194.08257324 52.83447266 193.84741211 C54.4044494 193.41850094 55.97443584 192.98962526 57.54443359 192.56079102 C61.36156945 191.52372228 61.36156945 191.52372228 65 190 C64.04806763 189.98598145 64.04806763 189.98598145 63.0769043 189.97167969 C48.50306994 189.70799346 34.15717427 188.7617296 19.6875 187.0625 C18.59325211 186.93445984 18.59325211 186.93445984 17.47689819 186.80383301 C12.64712828 186.23345681 7.82294896 185.62514488 3 185 C2.00833832 184.87464874 2.00833832 184.87464874 0.99664307 184.74676514 C-0.91333587 184.50383362 -2.82193781 184.25015063 -4.73046875 183.99609375 C-5.82125732 183.85228271 -6.9120459 183.70847168 -8.03588867 183.56030273 C-10.9202872 183.01506802 -13.30313431 182.13245492 -16 181 C-17.33961625 180.67262367 -18.68958618 180.38457998 -20.046875 180.140625 C-20.8006543 179.9977002 -21.55443359 179.85477539 -22.33105469 179.70751953 C-23.12930664 179.55653809 -23.92755859 179.40555664 -24.75 179.25 C-34.20177557 177.35564144 -43.03025926 174.49293022 -52 171 C-52.66016113 170.74428223 -53.32032227 170.48856445 -54.00048828 170.22509766 C-58.35325502 168.52990031 -62.67817065 166.77243563 -67 165 C-68.50433594 164.40251953 -68.50433594 164.40251953 -70.0390625 163.79296875 C-81.54610427 159.15603413 -92.5818447 153.57440105 -103.25 147.25 C-103.86979736 146.88551758 -104.48959473 146.52103516 -105.12817383 146.14550781 C-108.51187502 144.096257 -111.56827837 142.1458923 -114 139 C-114.53125 136.30859375 -114.53125 136.30859375 -114.5 133.4375 C-114.5103125 132.48746094 -114.520625 131.53742188 -114.53125 130.55859375 C-114 128 -114 128 -112.26171875 126.1796875 C-109.70302296 124.84510006 -108.182357 124.62742248 -105.3125 124.6875 C-104.52488281 124.69136719 -103.73726563 124.69523437 -102.92578125 124.69921875 C-100.43960017 124.95480746 -98.20236301 125.38137824 -95.77734375 125.94921875 C-50.18601081 136.46088075 5.36865045 128.97707511 48 111 C47.40501709 110.94054199 46.81003418 110.88108398 46.19702148 110.81982422 C32.86770451 109.44785585 19.71186716 107.55101802 6.5625 105 C4.61911743 104.62657471 4.61911743 104.62657471 2.63647461 104.24560547 C-4.38238027 102.85287057 -11.19570227 101.21024331 -18 99 C-18.74660889 98.76845215 -19.49321777 98.5369043 -20.26245117 98.29833984 C-29.98127356 95.27830065 -39.00298369 91.80563522 -48 87 C-50.3112231 85.87237904 -52.62378356 84.74749609 -54.9375 83.625 C-79.41977612 71.37033582 -79.41977612 71.37033582 -85 63 C-85.37109375 60.9140625 -85.37109375 60.9140625 -85.4375 58.625 C-85.49744141 57.49964844 -85.49744141 57.49964844 -85.55859375 56.3515625 C-84.68419829 52.67054105 -82.98007995 51.26719808 -80 49 C-77.11662583 48.43509404 -74.64816612 48.13289486 -71.75 48 C-55.08356216 46.68341972 -38.44287468 41.63138286 -26 30 C-24.19295351 27.73898817 -22.6186978 25.40352098 -21 23 C-20.34 23 -19.68 23 -19 23 C-18.86207031 22.41605469 -18.72414063 21.83210938 -18.58203125 21.23046875 C-17.22858108 16.04375702 -15.07433418 11.06048478 -13 6.125 C-12.690625 5.38507813 -12.38125 4.64515625 -12.0625 3.8828125 C-9.40705503 -0.82279218 -4.80535783 -0.82064934 0 0 Z " fill="currentColor" transform="translate(516,329)"/></svg>
+      <span class="maine-mark-text">
+        <strong>Maine Ready</strong>
+        <em>View home instruction law →</em>
+      </span>
+    </a>
+  </div>
+</header>
+
+<main>
+
+<!-- TAB BAR -->
+<div id="tab-mapper">
+
+  <div class="card">
+    <div class="section-label"><h2>What did your child do?</h2></div>
+    <p class="card-hint">Write anything — "played in the stream," "helped can tomatoes," "built a rabbit hutch." The tool connects it to a real learning standard and writes a portfolio-ready entry.</p>
+
+    <!-- Framework selector -->
+    <div class="framework-row">
+      <label>Standards Framework</label>
+      <select id="framework">
+        <option value="us">United States Standards (Common Core + Next Generation Science)</option>
+        <option value="ib">International Baccalaureate — IB PYP / MYP</option>
+        <option value="cambridge">Cambridge Primary &amp; Lower Secondary</option>
+        <option value="montessori">Montessori Developmental Framework</option>
+        <option value="trivium">Classical Trivium (Grammar · Logic · Rhetoric)</option>
+        <option value="sdg">United Nations Sustainable Development Goals (SDGs)</option>
+      </select>
+      <span class="framework-note">Choose the framework that best fits your family's approach. The tool maps your activities to that framework's standards.</span>
+    </div>
+
+    <!-- Grade / Name -->
+    <div class="meta-row">
+      <label>Grade</label>
+      <select id="mapGrade">
+        <option value="">— optional —</option>
+        <option>K</option><option>1</option><option>2</option><option>3</option>
+        <option>4</option><option>5</option><option>6</option><option>7</option>
+        <option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+      </select>
+      <label style="margin-left:0.5rem;">Child's Name</label>
+      <input type="text" id="mapName" placeholder="optional" style="max-width:130px;">
+    </div>
+
+    <!-- Activity input -->
+    <div class="activity-wrap">
+      <div class="activity-row">
+        <textarea id="activityInput" placeholder="Describe anything — a morning, a conversation, a thing they made, a place they went, a question they wouldn't stop asking…"></textarea>
+        <button class="btn-primary" id="mapBtn" onclick="mapActivity()">→ Map It</button>
+      </div>
+
+      <!-- Voice + Photo row -->
+      <div class="input-tools-row">
+        <button class="voice-trigger" id="voiceBtn" onclick="toggleVoice()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zm-4 8a5 5 0 0 0 10 0h2a7 7 0 0 1-6 6.92V21h2v2H9v-2h2v-2.08A7 7 0 0 1 5 12H7z"/>
+          </svg>
+          <span id="voiceBtnLabel">Speak a field note</span>
+        </button>
+
+        <button class="photo-trigger" onclick="document.getElementById('photoInput').click()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 8a5 5 0 1 1 0-10A5 5 0 0 1 12 17zm6.5-12H19l-1.5-2h-11L5 5h-.5A3.5 3.5 0 0 0 1 8.5v10A3.5 3.5 0 0 0 4.5 22h15a3.5 3.5 0 0 0 3.5-3.5v-10A3.5 3.5 0 0 0 18.5 5z"/>
+          </svg>
+          <span>Add a photo</span>
+        </button>
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
+      </div>
+      <div class="voice-status" id="voiceStatus"></div>
+
+      <!-- Photo thumbnails -->
+      <div class="photo-previews" id="photoPreviews"></div>
+    </div>
+
+    <!-- Focus subject -->
+    <div class="focus-row">
+      <label>Focus Subject</label>
+      <select id="focusSubject">
+        <option value="">Find the best fit(s) automatically</option>
+        <option value="science">Science</option>
+        <option value="math">Mathematics</option>
+        <option value="ela">English &amp; Language Arts</option>
+        <option value="social">Social Studies</option>
+        <option value="pe">Physical Education</option>
+        <option value="health">Health Education</option>
+        <option value="arts">Fine Arts</option>
+        <option value="library">Library Skills</option>
+        <option value="maine">Maine Studies</option>
+        <option value="computer">Computer Proficiency</option>
+      </select>
+      <span class="focus-note">Select only if you need more portfolio entries in a specific subject area.</span>
+    </div>
+
+    <!-- Results -->
+    <div id="mapperResults"></div>
+
+    <!-- Copy toolbar -->
+    <div class="copy-toolbar" id="copyToolbar">
+      <div class="toolbar-inner">
+        <span class="toolbar-count" id="toolbarCount"></span>
+        <button class="t-btn primary" onclick="addAllToSaved()">+ Add All to Portfolio</button>
+        <button class="t-btn" onclick="copyAllResults()">Copy All</button>
+        <button class="t-btn" onclick="clearResults()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="how-strip">
+    <h3>How Field Notes works</h3>
+    <div class="how-steps">
+      <span class="how-step">Type, speak, or snap a photo</span>
+      <span class="how-arrow"> → </span>
+      <span class="how-step">We identify the learning standard it meets</span>
+      <span class="how-arrow"> → </span>
+      <span class="how-step">You get a portfolio-ready entry to copy</span>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" id="emptyState">
+    <p class="empty-hint">Describe something, hit Map It — your portfolio entries will appear here ↓</p>
+    <div class="ghost-cards">
+      <div class="ghost-card">
+        <div class="ghost-tag"></div>
+        <div class="ghost-line long"></div>
+        <div class="ghost-line medium"></div>
+        <div class="ghost-line long"></div>
+        <div class="ghost-line short"></div>
+      </div>
+      <div class="ghost-card">
+        <div class="ghost-tag"></div>
+        <div class="ghost-line medium"></div>
+        <div class="ghost-line long"></div>
+        <div class="ghost-line long"></div>
+        <div class="ghost-line medium"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved pad -->
+  <div class="saved-pad" id="savedPad">
+    <h3>Saved Entries This Session</h3>
+    <p class="pad-sub">Copy individually, all at once, or paste directly into your portfolio document.</p>
+    <div class="pad-action-row">
+      <button class="btn-rust" onclick="copyAllSaved()">Copy All Entries</button>
+      <button class="btn-ghost" onclick="clearSaved()">Clear All</button>
+      <label class="standard-toggle">
+        <input type="checkbox" id="showStandards" onchange="renderSaved()">
+        <span>Include standard codes</span>
+      </label>
+    </div>
+    <div id="savedEntries"></div>
+  </div>
+
+</div>
+
+</main>
+  <div class="maine-strip">
+    <div class="maine-strip-inner">
+      <span class="maine-strip-label">Maine families</span>
+      Field Notes meets all Maine home instruction requirements — 175 days, required subject areas, annual assessment.
+      <a href="https://legislature.maine.gov/statutes/20-A/title20-Asec5001-A.html" target="_blank" rel="noopener">Read Maine home instruction law →</a>
+    </div>
+  </div>
+
+  <!-- About this tool strip -->
+  <div class="about-strip">
+    <img src="data:image/png;base64,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" alt="Learning Circles" class="lc-logo">
+    <div class="about-strip-text">
+      <span class="about-strip-label">Built by Learning Circles</span>
+      <span class="about-strip-sub">Find out how to <a href="field-notes-about.html" class="support-link">support this work within our growing community →</a></span>
+    </div>
+  </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+
+// ── SUBJECTS ────────────────────────────────────────────────────────────────
+const S = {
+  ela:      { label: 'English & Language Arts', icon: '📖', hint: 'Reading, writing, phonics, grammar, literature, narration, journaling' },
+  math:     { label: 'Mathematics',             icon: '🔢', hint: 'Arithmetic, measurement, fractions, geometry, budgeting, practical math' },
+  science:  { label: 'Science',                 icon: '🔬', hint: 'Nature study, animal care, gardening, experiments, weather, ecosystems' },
+  social:   { label: 'Social Studies',          icon: '🌍', hint: 'History, geography, civics, community, cultures, map work, biographies' },
+  pe:       { label: 'Physical Education',      icon: '🏃', hint: 'Farm chores, hiking, swimming, sports, outdoor play, physical labor' },
+  health:   { label: 'Health Education',        icon: '❤️', hint: 'Nutrition, hygiene, first aid, food safety, body systems, wellness' },
+  library:  { label: 'Library Skills',          icon: '📚', hint: 'Library visits, research skills, finding and evaluating sources' },
+  arts:     { label: 'Fine Arts',               icon: '🎨', hint: 'Drawing, painting, music, fiber arts, pottery, theater, crafts' },
+  maine:    { label: 'Maine Studies',           icon: '🦞', hint: 'Maine history, ecology, geography, government, industries, local culture' },
+  computer: { label: 'Computer Proficiency',    icon: '💻', hint: 'Word processing, research, digital safety, spreadsheets, coding' }
+};
+
+const FRAMEWORKS = {
+  us: {
+    name: 'United States Standards (Common Core + Next Generation Science)',
+    instruction: 'Use real Common Core State Standards (CCSS) codes for ELA and Math (e.g. CCSS.ELA-LITERACY.RL.3.1, CCSS.MATH.CONTENT.4.MD.A.1), Next Generation Science Standards (NGSS) codes for Science (e.g. NGSS 3-LS1-1), and C3 Framework codes for Social Studies. Use SHAPE America standards for PE, and ISTE standards for Computer Proficiency.'
+  },
+  ib: {
+    name: 'International Baccalaureate — IB PYP / MYP',
+    instruction: 'Reference IB Primary Years Programme (PYP) transdisciplinary themes for grades K–5, and IB Middle Years Programme (MYP) subject group objectives for grades 6–10. Use real IB language: Approaches to Learning (ATL), IB Learner Profile attributes, and transdisciplinary themes.'
+  },
+  cambridge: {
+    name: 'Cambridge Primary & Lower Secondary',
+    instruction: 'Reference Cambridge Primary (ages 5–11) and Cambridge Lower Secondary (ages 11–14) curriculum frameworks with real Cambridge learning objectives, strands, and sub-strands.'
+  },
+  montessori: {
+    name: 'Montessori Developmental Framework',
+    instruction: 'Reference Montessori developmental planes and curriculum areas: Practical Life, Sensorial, Language, Mathematics, Cultural. Reference the appropriate plane of development and connect to Montessori principles like the prepared environment and sensitive periods.'
+  },
+  trivium: {
+    name: 'Classical Trivium (Grammar · Logic · Rhetoric)',
+    instruction: 'Reference the Classical Trivium stages: Grammar stage (ages 4–11, absorbing foundational knowledge), Logic stage (ages 11–14, analytical thinking), Rhetoric stage (ages 14–18, articulating and defending knowledge). Reference classical subject areas and the Well-Trained Mind framework.'
+  },
+  sdg: {
+    name: 'United Nations Sustainable Development Goals',
+    instruction: 'Map the activity to one or more of the 17 UN SDGs with full goal name and number (e.g. "SDG 4: Quality Education"). Describe which specific SDG target it supports. Frame in terms of contribution and global citizenship.'
+  }
+};
+
+// ── SAVED ENTRIES ─────────────────────────────────────────────────────────────
+let savedEntries = [];
+
+function saveToPad(subjectKey, e) {
+  const dup = savedEntries.find(s => s.subjectKey === subjectKey && s.portfolioEntry === e.portfolioEntry);
+  if (dup) return;
+  savedEntries.push({ subjectKey, subjectLabel: e.subjectLabel || S[subjectKey]?.label, activitySnippet: e.activitySnippet || e.cleanedActivity || '', standard: e.standard || '', portfolioEntry: e.portfolioEntry || '' });
+  renderSaved();
+  document.getElementById('savedPad').classList.add('visible');
+  // Hide empty state once real entries exist
+  const emptyState = document.getElementById('emptyState');
+  if (emptyState) emptyState.classList.add('hidden');
+}
+
+function renderSaved() {
+  const showStd = document.getElementById('showStandards')?.checked;
+  document.getElementById('savedEntries').innerHTML = savedEntries.map((e, i) => `
+    <div class="saved-entry">
+      <div class="saved-entry-header">
+        <span class="subject-tag ${e.subjectKey}">${S[e.subjectKey]?.icon || ''} ${e.subjectLabel}</span>
+        <div class="entry-btns">
+          <button class="copy-chip" onclick="copyEntry(${i})" id="chip-${i}">Copy</button>
+          <button class="remove-btn" onclick="removeEntry(${i})" title="Remove">✕</button>
+        </div>
+      </div>
+      <div class="saved-activity">${e.activitySnippet}</div>
+      ${showStd && e.standard ? `<div class="saved-standard">${e.standard}</div>` : ''}
+      <p class="saved-text">${e.portfolioEntry}</p>
+    </div>`).join('');
+}
+
+function copyEntry(i) {
+  const e = savedEntries[i];
+  const showStd = document.getElementById('showStandards')?.checked;
+  const stdLine = showStd && e.standard ? `${e.standard}\n` : '';
+  const text = `${S[e.subjectKey]?.icon || ''} ${e.subjectLabel}\n${e.activitySnippet}\n${stdLine}\n${e.portfolioEntry}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('chip-' + i);
+    btn.textContent = '✅'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 2000);
+  }).catch(() => {
+    const btn = document.getElementById('chip-' + i);
+    btn.textContent = 'Copy failed'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 2500);
+  });
+}
+
+function removeEntry(i) {
+  savedEntries.splice(i, 1);
+  renderSaved();
+  if (!savedEntries.length) document.getElementById('savedPad').classList.remove('visible');
+}
+
+function copyAllSaved() {
+  const showStd = document.getElementById('showStandards')?.checked;
+  const text = savedEntries.map(e => {
+    const stdLine = showStd && e.standard ? `${e.standard}\n` : '';
+    return `${S[e.subjectKey]?.icon || ''} ${e.subjectLabel}\n${e.activitySnippet}\n${stdLine}\n${e.portfolioEntry}`;
+  }).join('\n\n\u2014\n\n');
+  navigator.clipboard.writeText(text);
+}
+
+function clearSaved() {
+  savedEntries = [];
+  document.getElementById('savedPad').classList.remove('visible');
+}
+
+// ── PHOTO HANDLING ────────────────────────────────────────────────────────────
+let attachedPhotos = [];
+const MAX_PHOTOS = 3;
+
+function handlePhotos(event) {
+  const files = Array.from(event.target.files);
+  const remaining = MAX_PHOTOS - attachedPhotos.length;
+  const toAdd = files.slice(0, remaining);
+  if (remaining === 0) { showVoiceStatus('Maximum 3 photos already attached.', true); event.target.value = ''; return; }
+  toAdd.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+          else { width = Math.round(width * MAX / height); height = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        attachedPhotos.push({ base64: dataUrl.split(',')[1], mediaType: 'image/jpeg', previewUrl: dataUrl });
+        renderPhotoPreviews();
+      };
+      img.onerror = () => showVoiceStatus('Could not load that image — try a different file.', true);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => showVoiceStatus('Could not read that image — try a different file.', true);
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function removePhoto(i) { attachedPhotos.splice(i, 1); renderPhotoPreviews(); }
+
+function renderPhotoPreviews() {
+  const container = document.getElementById('photoPreviews');
+  if (!container) return;
+  container.innerHTML = attachedPhotos.map((p, i) => `<div class="photo-thumb"><img src="${p.previewUrl}" alt="Photo ${i+1}"><button onclick="removePhoto(${i})" class="photo-remove">✕</button></div>`).join('');
+  const btn = document.querySelector('.photo-trigger span');
+  if (btn) btn.textContent = attachedPhotos.length === 0 ? 'Add a photo' : attachedPhotos.length < MAX_PHOTOS ? `Add another (${attachedPhotos.length}/${MAX_PHOTOS})` : `${MAX_PHOTOS} photos attached`;
+  // Update Map It button when photos are present
+  const mapBtn = document.getElementById('mapBtn');
+  if (mapBtn && !mapBtn.disabled) {
+    if (attachedPhotos.length > 0) {
+      mapBtn.textContent = attachedPhotos.length === 1 ? '→ Map Photo' : `→ Map ${attachedPhotos.length} Photos`;
+      mapBtn.classList.add('has-photos');
+    } else {
+      mapBtn.textContent = '→ Map It';
+      mapBtn.classList.remove('has-photos');
+    }
+  }
+}
+
+// ── VOICE INPUT ───────────────────────────────────────────────────────────────
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+function toggleVoice() {
+  if (!SpeechRecognition) { showVoiceStatus('Voice input is not supported in this browser. Try Chrome.', true); return; }
+  if (isListening) { try { recognition.stop(); } catch(e) {} return; }
+  recognition = new SpeechRecognition();
+  recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+  let committed = document.getElementById('activityInput').value.trim();
+  recognition.onstart = () => { isListening = true; setVoiceListening(true); };
+  recognition.onresult = (event) => {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) committed += (committed ? ' ' : '') + t.trim();
+      else interim = t;
+    }
+    document.getElementById('activityInput').value = committed + (interim ? (committed ? ' ' : '') + interim : '');
+  };
+  recognition.onerror = (event) => {
+    if (event.error === 'aborted') return;
+    isListening = false; setVoiceListening(false);
+    const msgs = { 'not-allowed': 'Microphone access denied.', 'no-speech': 'Nothing heard — try speaking.', 'network': 'Network error.' };
+    showVoiceStatus(msgs[event.error] || ('Voice error: ' + event.error), true);
+  };
+  recognition.onend = () => {
+    if (isListening) { try { recognition.start(); return; } catch(e) {} }
+    isListening = false; setVoiceListening(false);
+  };
+  try { recognition.start(); } catch(e) { showVoiceStatus('Could not start microphone.', true); }
+}
+
+function setVoiceListening(on) {
+  const btn = document.getElementById('voiceBtn');
+  const label = document.getElementById('voiceBtnLabel');
+  if (!btn || !label) return;
+  btn.classList.toggle('listening', on);
+  label.textContent = on ? 'Tap to stop' : 'Speak a field note';
+  if (on) showVoiceStatus('Listening… tap to stop when done', false);
+  else showVoiceStatus('', false);
+}
+
+function showVoiceStatus(msg, isError) {
+  const el = document.getElementById('voiceStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.toggle('visible', !!msg);
+  el.classList.toggle('error', !!isError);
+}
+
+// ── ACTIVITY MAPPER ───────────────────────────────────────────────────────────
+let currentResults = [];
+
+async function mapActivity() {
+  const rawInput = document.getElementById('activityInput').value.trim();
+  if (!rawInput && !attachedPhotos.length) { alert('Please describe an activity or attach a photo first.'); return; }
+
+  const frameworkKey = document.getElementById('framework')?.value || 'us';
+  const framework    = FRAMEWORKS[frameworkKey];
+  const focus        = document.getElementById('focusSubject').value;
+  const grade        = document.getElementById('mapGrade').value;
+  const name         = document.getElementById('mapName').value.trim();
+  const btn          = document.getElementById('mapBtn');
+
+  btn.disabled = true; btn.textContent = '…';
+  document.getElementById('mapperResults').innerHTML = '<div class="loading"><span class="spinner"></span> Connecting to learning standards…</div>';
+  hideToolbar();
+
+  const gradeCtx = grade ? ` Student is in grade ${grade === 'K' ? 'Kindergarten' : grade}.` : '';
+  const nameCtx  = name  ? ` Student's name is ${name}.` : '';
+  const focusCtx = focus
+    ? ` Parent specifically needs this connected to: ${S[focus]?.label}. Frame it toward that subject honestly.`
+    : ' Identify 1–3 subject areas with a genuine connection only.';
+
+  const prompt = `You are an educational documentation assistant for homeschooling families. Your role: direct, honest documentation — no embellishment.
+
+Parent typed: "${rawInput}"${gradeCtx}${nameCtx}
+${focusCtx}
+
+STANDARDS FRAMEWORK: ${framework.name}
+${framework.instruction}
+
+Subject areas (Maine home instruction categories): English & Language Arts, Mathematics, Science, Social Studies, Physical Education, Health Education, Library Skills, Fine Arts, Maine Studies (grades 6–12 only), Computer Proficiency (grades 7–12 only).
+
+Return a JSON object with exactly two fields:
+
+"cleanedActivity": The activity name only — spelling and grammar corrected, 3–8 words. Just the activity, cleaned.
+
+"entries": Array of matched subjects. Each item:
+- "subject": one of: ela, math, science, social, pe, health, library, arts, maine, computer
+- "subjectLabel": full subject name
+- "activitySnippet": The specific part of the activity relevant to this subject only — 2–6 words, grammar corrected. If the parent typed "played drum and caught a frog", Fine Arts gets "Playing drum" and Science gets "Catching a frog". Never the full raw input.
+- "standard": Specific standard reference with code from the chosen framework
+- "connection": ONE sentence. What specific skill was practiced. Start with the activity.
+- "portfolioEntry": 2–3 sentences. What the student did, what skill was developed, which standard it meets.
+
+RULES: Only genuine connections. Never echo raw misspelled input. Return only valid JSON, no markdown.`;
+
+  try {
+    const userContent = [];
+    if (attachedPhotos.length) {
+      attachedPhotos.forEach(p => userContent.push({ type: 'image', source: { type: 'base64', media_type: p.mediaType, data: p.base64 } }));
+    }
+    userContent.push({ type: 'text', text: prompt });
+
+    const resp = await fetch("/.netlify/functions/claude", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2500, messages: [{ role: "user", content: userContent }] })
+    });
+
+    const data = await resp.json();
+    const raw = (data.content || []).map(c => c.text || '').join('');
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    const cleanedActivity = parsed.cleanedActivity || rawInput;
+    const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+    if (!entries.length) throw new Error('No matches found — try rephrasing the activity.');
+    currentResults = entries.map((e, i) => ({ ...e, cleanedActivity, _id: 'rc' + Date.now() + i }));
+    renderCards(currentResults, cleanedActivity, rawInput, framework.name);
+    attachedPhotos = []; renderPhotoPreviews();
+  } catch(err) {
+    document.getElementById('mapperResults').innerHTML = `<div class="error-note">⚠️ ${err.message || 'Something went wrong. Please try again.'}</div>`;
+  }
+
+  btn.disabled = false; btn.textContent = '→ Map It';
+  document.getElementById('activityInput').value = '';
+}
+
+function renderCards(results, cleanedActivity, rawInput, frameworkName) {
+  const showCorrection = cleanedActivity.toLowerCase().trim() !== rawInput.toLowerCase().trim();
+  const correction = showCorrection ? `<div class="correction-note">✏️ Recorded as: <strong>"${cleanedActivity}"</strong></div>` : '';
+  const fwLabel = `<div style="font-size:0.76rem;color:#8a7a62;font-style:italic;margin-bottom:0.85rem;">Framework: ${frameworkName}</div>`;
+  const cards = results.map(e => {
+    const k = e.subject || 'science';
+    return `<div class="result-card ${k}" id="${e._id}">
+      <span class="subject-tag ${k}">${S[k]?.icon || ''} ${e.subjectLabel || S[k]?.label}</span>
+      <div class="rc-activity">${cleanedActivity}</div>
+      <div class="field-note standard"><strong>Standard:</strong> ${e.standard || ''}</div>
+      <div class="field-note conn"><strong>Connection:</strong> ${e.connection || ''}</div>
+      <p class="narrative" id="narr-${e._id}">${e.portfolioEntry || ''}</p>
+
+      <!-- Inline edit area -->
+      <div class="inline-edit-wrap" id="edit-${e._id}">
+        <textarea id="edit-ta-${e._id}">${(e.portfolioEntry || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+        <div class="inline-edit-actions">
+          <button class="ca-commit" onclick="commitEdit('${e._id}')">✓ Add to Portfolio</button>
+          <button class="ca-cancel" onclick="closeEdit('${e._id}')">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Card action row -->
+      <div class="card-actions">
+        <button class="ca-add" id="cadd-${e._id}" onclick="directAdd('${e._id}')">+ Add to Portfolio</button>
+        <button class="ca-edit" onclick="openEdit('${e._id}')">Edit then Add</button>
+        <button class="ca-discard" onclick="discardCard('${e._id}')">Discard</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('mapperResults').innerHTML = `${correction}${fwLabel}${cards}`;
+  updateToolbar();
+}
+
+// ── INLINE CARD ACTIONS ───────────────────────────────────────────────────────
+
+function directAdd(id) {
+  const entry = currentResults.find(e => e._id === id);
+  if (!entry) return;
+  saveToPad(entry.subject, entry);
+  const addBtn = document.getElementById('cadd-' + id);
+  if (addBtn) { addBtn.textContent = '✅ Added'; addBtn.disabled = true; }
+  const card = document.getElementById(id);
+  if (card) {
+    card.classList.add('added-flash');
+    setTimeout(() => card.classList.remove('added-flash'), 1400);
+  }
+}
+
+function openEdit(id) {
+  const entry = currentResults.find(e => e._id === id);
+  if (!entry) return;
+  const wrap = document.getElementById('edit-' + id);
+  const ta = document.getElementById('edit-ta-' + id);
+  if (!wrap || !ta) return;
+  // Set raw text (undo any HTML escaping from template)
+  ta.value = entry.portfolioEntry || '';
+  wrap.classList.add('open');
+  ta.focus();
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeEdit(id) {
+  const wrap = document.getElementById('edit-' + id);
+  if (wrap) wrap.classList.remove('open');
+}
+
+function commitEdit(id) {
+  const entry = currentResults.find(e => e._id === id);
+  if (!entry) return;
+  const ta = document.getElementById('edit-ta-' + id);
+  const newText = ta ? ta.value.trim() : entry.portfolioEntry;
+  if (!newText) return;
+  // Update the displayed narrative
+  const narr = document.getElementById('narr-' + id);
+  if (narr) narr.textContent = newText;
+  // Save with edited text
+  const edited = { ...entry, portfolioEntry: newText };
+  saveToPad(entry.subject, edited);
+  closeEdit(id);
+  const addBtn = document.getElementById('cadd-' + id);
+  if (addBtn) { addBtn.textContent = '✅ Added'; addBtn.disabled = true; }
+  const card = document.getElementById(id);
+  if (card) {
+    card.classList.add('added-flash');
+    setTimeout(() => card.classList.remove('added-flash'), 1400);
+  }
+}
+
+function discardCard(id) {
+  const card = document.getElementById(id);
+  if (!card) return;
+  card.classList.add('discarded');
+  setTimeout(() => {
+    card.remove();
+    const idx = currentResults.findIndex(e => e._id === id);
+    if (idx > -1) currentResults.splice(idx, 1);
+    updateToolbar();
+  }, 240);
+}
+
+function updateToolbar() {
+  if (currentResults.length > 0) {
+    document.getElementById('copyToolbar').classList.add('visible');
+    document.getElementById('toolbarCount').textContent = `${currentResults.length} result${currentResults.length !== 1 ? 's' : ''}`;
+  } else {
+    hideToolbar();
+  }
+}
+
+function hideToolbar() {
+  document.getElementById('copyToolbar')?.classList.remove('visible');
+  currentResults = [];
+}
+
+function clearResults() {
+  document.getElementById('mapperResults').innerHTML = '';
+  hideToolbar();
+}
+
+function entryToText(e) {
+  return `${S[e.subject]?.icon || ''} ${e.subjectLabel || S[e.subject]?.label}\n${e.activitySnippet || e.cleanedActivity}\n${e.standard}\n${e.connection}\n\n${e.portfolioEntry}`;
+}
+
+function copyAllResults() {
+  if (!currentResults.length) return;
+  navigator.clipboard.writeText(currentResults.map(entryToText).join('\n\n\u2014\n\n')).then(() => flashCount('✅ All copied!'));
+}
+
+function addAllToSaved() {
+  if (!currentResults.length) return;
+  currentResults.forEach(e => {
+    saveToPad(e.subject, e);
+    const addBtn = document.getElementById('cadd-' + e._id);
+    if (addBtn) { addBtn.textContent = '✅ Added'; addBtn.disabled = true; }
+  });
+  flashCount('✅ All added');
+}
+
+function flashCount(msg) {
+  const el = document.getElementById('toolbarCount');
+  const orig = el.textContent;
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = orig; }, 2200);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('activityInput').addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); mapActivity(); }
+  });
+});
+
+
+</script>
+<footer>
+  Field Notes Portfolio Builder &nbsp;·&nbsp;
+  A <a href="https://www.learningcircles.net" target="_blank" rel="noopener">Learning Circles</a> tool
+  &nbsp;·&nbsp; learningcircles.net
+</footer>
+</body>
+</html>
