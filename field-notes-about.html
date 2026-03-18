@@ -516,6 +516,53 @@ footer {
 footer a { color: var(--forest-mid); text-decoration: none; }
 footer a:hover { text-decoration: underline; }
 
+/* ── GLOBAL LINK COLOR FIX ───────────────────────────────── */
+main a {
+  color: var(--forest-mid);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(61,97,64,0.3);
+  transition: color 0.15s, border-color 0.15s;
+}
+main a:hover {
+  color: var(--bark);
+  border-bottom-color: var(--bark);
+}
+
+/* ── ANTHROPIC CREDIT ────────────────────────────────────── */
+.anthropic-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+  padding: 0.5rem 0.9rem;
+  background: rgba(46,74,46,0.06);
+  border-radius: 4px;
+  border: 1px solid rgba(46,74,46,0.12);
+}
+
+.anthropic-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--forest-mid);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.anthropic-credit span {
+  font-size: 0.78rem;
+  font-family: 'Spectral', serif;
+  font-style: italic;
+  color: var(--ink-mid);
+  opacity: 0.8;
+}
+
+.anthropic-credit a {
+  color: var(--forest-mid) !important;
+  border-bottom: 1px solid rgba(61,97,64,0.3) !important;
+  font-style: normal;
+  font-weight: 600;
+}
+
 @media (max-width: 600px) {
   .header-inner { grid-template-columns: 1fr; padding: 2rem 1.25rem 1.75rem; }
   .back-link { display: none; }
@@ -612,13 +659,22 @@ footer a:hover { text-decoration: underline; }
 
     <div class="coming-item">
       <h3>Heartwood</h3>
-      <p>Our outdoor social-emotional learning program for children ages 4–10. Nature-based, relationship-centered, rooted in Waldo County, Maine.</p>
+      <p>Our outdoor social-emotional learning program for children ages 4–10. Nature-based, relationship-centered, rooted in Maine, USA.</p>
     </div>
 
     <div class="coming-item">
       <h3>A growing community</h3>
       <p>For families who learn differently — homeschoolers, unschoolers, worldschoolers, and everyone in between. Tools, resources, and real connection.</p>
     </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- AI + WATER -->
+  <div class="about-section">
+    <div class="section-heading"><h2>AI has a footprint.</h2></div>
+    <p>This one gives back. Ten percent of contributions go to water conservation — <a href="https://belfastbaywatershed.org" target="_blank" rel="noopener">the Belfast Bay Watershed Coalition</a> in Waldo County, and <a href="https://www.nature.org/en-us/what-we-do/our-priorities/provide-food-and-water-sustainably/" target="_blank" rel="noopener">The Nature Conservancy's freshwater programs</a>.</p>
+
   </div>
 
   <hr class="divider">
@@ -650,21 +706,41 @@ footer a:hover { text-decoration: underline; }
 </footer>
 
 <script>
-function handleEmailSignup(btn) {
+async function handleEmailSignup(btn) {
   const input = btn.previousElementSibling;
   const email = input.value.trim();
+
   if (!email || !email.includes('@')) {
     input.focus();
     input.style.borderColor = '#b8301b';
     setTimeout(() => input.style.borderColor = '', 1500);
     return;
   }
-  // TODO: Replace this with your email service action URL
-  // e.g. Mailchimp, ConvertKit, or a Google Form endpoint
-  btn.textContent = '✓ You\'re in';
+
+  btn.textContent = 'Joining…';
   btn.disabled = true;
   input.disabled = true;
-  input.value = email;
+
+  try {
+    const res = await fetch('/.netlify/functions/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    if (res.ok) {
+      btn.textContent = '✓ You\'re in';
+      input.value = email;
+    } else {
+      throw new Error('Subscription failed');
+    }
+  } catch {
+    btn.textContent = 'Try again';
+    btn.disabled = false;
+    input.disabled = false;
+    input.style.borderColor = '#b8301b';
+    setTimeout(() => input.style.borderColor = '', 2000);
+  }
 }
 </script>
 </body>

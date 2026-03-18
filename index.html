@@ -1195,12 +1195,16 @@ main {
 /* ── ABOUT STRIP ──────────────────────────────────────── */
 .about-strip {
   margin-top: 1.5rem;
-  padding: 1.1rem 0 0.5rem;
+  padding: 1.1rem 2.25rem 0.5rem;
   border-top: 1px solid var(--fog-dark);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1.25rem;
   flex-wrap: wrap;
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .lc-logo {
@@ -1266,6 +1270,8 @@ main {
   margin-top: 1.25rem;
   border-top: 1px solid var(--fog-dark);
   padding-top: 0.75rem;
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
 }
 
 .maine-strip-inner {
@@ -1277,6 +1283,8 @@ main {
   align-items: baseline;
   gap: 0.4rem;
   flex-wrap: wrap;
+  max-width: 940px;
+  margin: 0 auto;
 }
 
 .maine-strip-label {
@@ -1793,7 +1801,7 @@ RULES: Only genuine connections. Never echo raw misspelled input. Return only va
     }
     userContent.push({ type: 'text', text: prompt });
 
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    const resp = await fetch("/.netlify/functions/claude", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2500, messages: [{ role: "user", content: userContent }] })
