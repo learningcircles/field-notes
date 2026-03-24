@@ -1808,8 +1808,8 @@ async function mapActivity() {
   const gradeCtx = grade ? ` Student is in grade ${grade === 'K' ? 'Kindergarten' : grade}.` : '';
   const nameCtx  = name  ? ` Student's name is ${name}.` : '';
   const focusCtx = focus
-    ? ` Parent specifically needs this connected to: ${S[focus]?.label}. Frame it toward that subject honestly.`
-    : ' Identify 1–3 subject areas with a genuine connection only.';
+    ? ` Parent has requested this be connected to: ${S[focus]?.label}. If a genuine connection exists, map it honestly. If the activity does not genuinely connect to that subject without inventing detail, do NOT fabricate — instead map to the best natural subject fit and return a "focusNote" field explaining which subject it was mapped to and what detail the parent could add to make a genuine connection to their requested subject.`
+    : ' Identify only subjects with a genuine connection. If the activity honestly connects to only one subject, return one entry — do not force additional matches.';
 
   const prompt = `You are an educational documentation assistant for homeschooling families. Your role: direct, honest documentation — no embellishment.
 
@@ -1831,9 +1831,10 @@ Return a JSON object with exactly two fields:
 - "activitySnippet": The specific part of the activity relevant to this subject only — 2–6 words, grammar corrected. If the parent typed "played drum and caught a frog", Fine Arts gets "Playing drum" and Science gets "Catching a frog". Never the full raw input.
 - "standard": Specific standard reference with code from the chosen framework
 - "connection": ONE sentence. What specific skill was practiced. Start with the activity.
-- "portfolioEntry": 2–3 sentences. Write in plain, warm language a parent would actually use. Describe what the child did and what it showed about their learning. No edu-jargon, no standard codes, no institutional language. Sound like a thoughtful person writing in a field notebook, not a teacher writing for an administrator.
+- "portfolioEntry": Field notebook voice — observational, warm, grounded only in what was described. Scale length to the detail provided: simple input gets 2 sentences; input with some context gets 2–3 sentences; input with specific names, scores, assessments, or rich detail gets 3–4 sentences maximum, never more. First sentence: describe only what was shared — no invented time references (never "today" or "this morning"), no assumed emotions, no inferred motivations. Middle sentences if warranted: expand only on details the parent actually provided. Final sentence: name the skill and connect it to the standard using the full plain-English meaning of that standard — never the abbreviation code, never an explanation of why the standard matters, just what it addresses. If the parent used technical language, restate it accurately. If they used plain language, keep it plain. Stop after the final sentence.
+- "focusNote": empty string unless a requested Focus Subject could not be genuinely met — in that case a brief plain-English note explaining what subject was mapped instead and what detail would create a real connection.
 
-RULES: Only genuine connections. Never echo raw misspelled input. Return only valid JSON, no markdown.`;
+RULES: Only genuine connections. Never fabricate activities, measurements, or behaviors not described. Never echo raw misspelled input. Return only valid JSON, no markdown.`;
 
   try {
     const userContent = [];
@@ -1854,8 +1855,9 @@ RULES: Only genuine connections. Never echo raw misspelled input. Return only va
     const cleanedActivity = parsed.cleanedActivity || rawInput;
     const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
     if (!entries.length) throw new Error('No matches found — try rephrasing the activity.');
+    const focusNote = parsed.focusNote || entries.find(e => e.focusNote)?.focusNote || '';
     currentResults = entries.map((e, i) => ({ ...e, cleanedActivity, _id: 'rc' + Date.now() + i }));
-    renderCards(currentResults, cleanedActivity, rawInput, framework.name);
+    renderCards(currentResults, cleanedActivity, rawInput, framework.name, focusNote);
     attachedPhotos = []; renderPhotoPreviews();
   } catch(err) {
     document.getElementById('mapperResults').innerHTML = `<div class="error-note">⚠️ ${err.message || 'Something went wrong. Please try again.'}</div>`;
@@ -1865,9 +1867,10 @@ RULES: Only genuine connections. Never echo raw misspelled input. Return only va
   document.getElementById('activityInput').value = '';
 }
 
-function renderCards(results, cleanedActivity, rawInput, frameworkName) {
+function renderCards(results, cleanedActivity, rawInput, frameworkName, focusNote) {
   const showCorrection = cleanedActivity.toLowerCase().trim() !== rawInput.toLowerCase().trim();
   const correction = showCorrection ? `<div class="correction-note">✏️ Recorded as: <strong>"${cleanedActivity}"</strong></div>` : '';
+  const focusWarn = focusNote ? `<div class="correction-note">ℹ️ ${focusNote}</div>` : '';
   const fwLabel = `<div style="font-size:0.76rem;color:#8a7a62;font-style:italic;margin-bottom:0.85rem;">Framework: ${frameworkName}</div>`;
   const selectId = 'sa' + Date.now();
   const cards = results.map(e => {
@@ -1897,7 +1900,7 @@ function renderCards(results, cleanedActivity, rawInput, frameworkName) {
       </div>
     </div>`;
   }).join('');
-  document.getElementById('mapperResults').innerHTML = `${correction}${fwLabel}<label class="select-all-row"><input type="checkbox" id="${selectId}" onchange="toggleSelectAll(this)"> Select all ${results.length} result${results.length !== 1 ? 's' : ''}</label>${cards}`;
+  document.getElementById('mapperResults').innerHTML = `${correction}${focusWarn}${fwLabel}<label class="select-all-row"><input type="checkbox" id="${selectId}" onchange="toggleSelectAll(this)"> Select all ${results.length} result${results.length !== 1 ? 's' : ''}</label>${cards}`;
   updateToolbar();
 }
 
