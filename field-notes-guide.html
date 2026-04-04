@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Use Field Notes — Learning Circles</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --parchment:   #f4ede0;
+  --paper:       #faf6ef;
+  --forest:      #2e4a2e;
+  --forest-mid:  #3d6140;
+  --bark:        #5c3d1e;
+  --mushroom:    #b8861b;
+  --lichen:      #7a9c6e;
+  --lichen-soft: #c8dbbf;
+  --cranberry:   #6b2535;
+  --ink:         #1e2419;
+  --ink-mid:     #3a3a2e;
+  --fog:         #e8e0d0;
+  --fog-dark:    #d4c9b4;
+  --white:       #fffdf8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+header {
+  background: var(--forest);
+  color: var(--parchment);
+  position: relative;
+  overflow: hidden;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 5px;
+  background: var(--mushroom);
+}
+
+.header-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 3rem 2.25rem 2.5rem;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1.5rem;
+}
+
+.header-eyebrow {
+  font-family: 'Spectral', serif;
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 0.4rem;
+}
+
+header h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.0;
+}
+
+header h1 span {
+  font-style: normal;
+  font-size: 0.5em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.65;
+  display: block;
+  margin-top: 0.35rem;
+  font-family: 'Spectral', serif;
+  font-weight: 300;
+}
+
+.back-link {
+  color: rgba(244,237,224,0.6);
+  text-decoration: none;
+  font-family: 'Spectral', serif;
+  font-size: 0.8rem;
+  font-style: italic;
+  border-bottom: 1px solid rgba(244,237,224,0.2);
+  transition: color 0.2s;
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 0.5rem;
+}
+
+.back-link:hover { color: var(--parchment); }
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 4rem 2.25rem 6rem;
+  position: relative;
+  z-index: 1;
+}
+
+main a {
+  color: var(--forest-mid);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(61,97,64,0.3);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+main a:hover {
+  color: var(--bark);
+  border-bottom-color: var(--bark);
+}
+
+/* ── OPENING ─────────────────────────────────────────────── */
+.kicker {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 600;
+  color: var(--forest);
+  line-height: 1.2;
+  margin-bottom: 1.25rem;
+}
+
+.opening-p {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--ink-mid);
+  margin-bottom: 2.5rem;
+}
+
+/* ── SECTION HEADINGS ────────────────────────────────────── */
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  margin-top: 3rem;
+}
+
+.section-heading:first-of-type { margin-top: 0; }
+
+.section-heading::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--mushroom);
+  flex-shrink: 0;
+}
+
+.section-heading h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--bark);
+  letter-spacing: 0.3px;
+}
+
+/* ── STEPS ──────────────────────────────────────────────── */
+.steps { display: flex; flex-direction: column; gap: 0; }
+
+.step {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 0 1.25rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--fog-dark);
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--mushroom);
+  line-height: 1.1;
+  opacity: 0.7;
+  padding-top: 0.1rem;
+}
+
+.step-body h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 0.45rem;
+  letter-spacing: 0.2px;
+}
+
+.step-body p {
+  font-size: 0.95rem;
+  color: var(--ink-mid);
+  line-height: 1.75;
+}
+
+.step-body p + p { margin-top: 0.6rem; }
+
+.step-note {
+  display: inline-block;
+  background: var(--lichen-soft);
+  border-radius: 3px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.84rem;
+  color: var(--forest);
+  font-style: italic;
+  margin-top: 0.75rem;
+  line-height: 1.55;
+}
+
+/* ── FRAMEWORK GRID ─────────────────────────────────────── */
+.fw-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.fw-item {
+  background: var(--white);
+  border-radius: 4px;
+  border-left: 4px solid var(--lichen);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 4px rgba(46,74,46,0.06);
+}
+
+.fw-item.philosophy { border-left-color: var(--bark); }
+.fw-item.wholechild { border-left-color: var(--mushroom); }
+.fw-item.international { border-left-color: #4a6ea8; }
+
+.fw-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 0.3rem;
+}
+
+.fw-desc {
+  font-size: 0.86rem;
+  color: var(--ink-mid);
+  line-height: 1.65;
+}
+
+.fw-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--lichen);
+  border-radius: 2px;
+  padding: 0.12rem 0.45rem;
+  margin-bottom: 0.4rem;
+  font-family: 'Spectral', serif;
+}
+
+.fw-tag.philosophy { background: var(--bark); }
+.fw-tag.wholechild { background: var(--mushroom); }
+.fw-tag.international { background: #4a6ea8; }
+
+/* ── PHOTO SECTION ──────────────────────────────────────── */
+.photo-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+}
+
+.photo-tip {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.93rem;
+  color: var(--ink-mid);
+  line-height: 1.65;
+}
+
+.photo-tip-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* ── PULLOUT ─────────────────────────────────────────────── */
+.pullout {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--forest);
+  border-left: 3px solid var(--mushroom);
+  padding-left: 1.25rem;
+  margin: 2rem 0;
+  line-height: 1.55;
+}
+
+/* ── DIVIDER ─────────────────────────────────────────────── */
+hr {
+  border: none;
+  border-top: 1px solid var(--fog-dark);
+  margin: 3rem 0;
+}
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 2rem 1rem 3rem;
+  font-size: 0.77rem;
+  color: #9a8a72;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+
+footer a { color: var(--forest-mid); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .header-inner { grid-template-columns: 1fr; padding: 2rem 1.25rem 1.75rem; }
+  .back-link { display: none; }
+  main { padding: 2.5rem 1.25rem 5rem; }
+  .step { grid-template-columns: 2rem 1fr; gap: 0 0.85rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="header-eyebrow">Learning Circles</div>
+      <h1>Field Notes
+        <span>How to use this tool</span>
+      </h1>
+    </div>
+    <a href="index.html" class="back-link">← Back to the tool</a>
+  </div>
+</header>
+
+<main>
+
+  <p class="kicker">Everything you need to get started.</p>
+  <p class="opening-p">Field Notes turns real-life moments into portfolio-ready documentation. You describe what happened — a morning, a project, a question your child wouldn't stop asking — and the tool connects it to a recognized learning standard and writes the entry for you. Here's how to use it well.</p>
+
+  <!-- ── HOW TO USE ─────────────────────────────────────── -->
+  <div class="section-heading"><h2>Step by step</h2></div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Work on one child at a time</h3>
+        <p>Field Notes documents one child's learning per session. If you have multiple children, complete and copy one child's entries before starting another. Enter the child's name and grade in the fields provided — the tool uses these to tailor the standard and the portfolio entry to the right level.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Choose your framework — and stick with it</h3>
+        <p>Select the standards framework that best fits your family's approach before you begin mapping entries. The tool will use that framework for every entry you generate.</p>
+        <p>If you change the framework mid-session, only new entries will reflect the change — anything already mapped or saved will keep its original standard. When in doubt, United States Standards (Common Core + NGSS) is the most widely recognized choice for portfolio documentation.</p>
+        <span class="step-note">Not sure which framework fits your family? See the <a href="#frameworks">framework guide below</a>.</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Describe what your child did</h3>
+        <p>Write anything — "helped press apple cider," "built a rabbit hutch," "asked how electricity works and we looked it up together." You don't need formal language. The more specific you are, the richer the entry will be, but even a few words will work.</p>
+        <p>You can type, speak a note using the microphone, or add a photo. All three produce portfolio entries.</p>
+        <span class="step-note">Using the photo feature? <a href="#photo">See photo guidance below →</a></span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Review and save the entries you want</h3>
+        <p>The tool returns 1–3 entries connecting your description to specific learning standards across relevant subject areas. Read each one — they are genuine connections only, never invented. Click a card to select it, then use the toolbar to save entries you want to keep for this session.</p>
+        <p>You can also use the Focus Subject selector if you specifically need more entries in a particular subject area — for example, if your portfolio is light on science documentation this term.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Copy entries into your portfolio document</h3>
+        <p>The saved entries section holds everything you've saved this session. When you're ready, copy entries individually or all at once and paste them into your portfolio document — a Word file, Google Doc, PDF form, or whatever format your assessor requires.</p>
+        <span class="step-note">We recommend copying your entries into your portfolio document when you're ready — this tab holds your work, but closing it or returning later will start a fresh session.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <!-- ── PHOTO GUIDANCE ─────────────────────────────────── -->
+  <div id="photo">
+    <div class="section-heading"><h2>Using the photo feature</h2></div>
+
+    <p>The photo feature lets you add up to three images alongside your description — or use a photo on its own with no text at all. The tool reads the image and generates portfolio entries based on what it sees.</p>
+
+    <div class="pullout">A photo of a finished birdhouse, an open nature journal, or a child mid-project tells the tool exactly what it needs.</div>
+
+    <p>Photos work best when:</p>
+
+    <div class="photo-tips">
+      <div class="photo-tip">
+        <span class="photo-tip-icon">✓</span>
+        <span>The subject is clear and fills most of the frame — a finished project, a page of written work, something built or made</span>
+      </div>
+      <div class="photo-tip">
+        <span class="photo-tip-icon">✓</span>
+        <span>Nature finds — a leaf collection, an identified insect, a sketched plant — photographed on a flat surface</span>
+      </div>
+      <div class="photo-tip">
+        <span class="photo-tip-icon">✓</span>
+        <span>An open book, a math problem in progress, a map they drew or studied</span>
+      </div>
+      <div class="photo-tip">
+        <span class="photo-tip-icon">✓</span>
+        <span>A child actively engaged in something — cooking, building, gardening, playing an instrument — where the activity is obvious</span>
+      </div>
+      <div class="photo-tip">
+        <span class="photo-tip-icon">✗</span>
+        <span>Very dark, blurry, or cluttered photos where the activity isn't clear — add a typed description alongside these to help the tool understand context</span>
+      </div>
+      <div class="photo-tip">
+        <span class="photo-tip-icon">✗</span>
+        <span>Photos where the learning is invisible — a child sitting on a couch, a general outdoor scene with no clear subject. Add a description to give the tool what it needs.</span>
+      </div>
+    </div>
+
+    <p style="margin-top:1.25rem; font-size:0.93rem; color:var(--ink-mid);">You can combine a photo with a typed or spoken description for the richest results — the tool uses everything you give it.</p>
+  </div>
+
+  <hr>
+
+  <!-- ── FRAMEWORK GUIDE ────────────────────────────────── -->
+  <div id="frameworks">
+    <div class="section-heading"><h2>Choosing a framework</h2></div>
+
+    <p style="margin-bottom:1.25rem; font-size:0.95rem; color:var(--ink-mid);">Not sure which framework fits your family? Here's a plain-English guide to all nine.</p>
+
+    <div class="fw-grid">
+
+      <div class="fw-item">
+        <div class="fw-tag">Academic</div>
+        <div class="fw-name">United States Standards — Common Core + NGSS</div>
+        <div class="fw-desc">The most widely recognized framework for US homeschool portfolios. Uses real CCSS codes for English and Math, Next Generation Science Standards for Science, and C3 Framework codes for Social Studies. Choose this if your assessor is a certified US teacher or if you want the most straightforward compliance documentation.</div>
+      </div>
+
+      <div class="fw-item philosophy">
+        <div class="fw-tag philosophy">Homeschool Philosophy</div>
+        <div class="fw-name">Charlotte Mason</div>
+        <div class="fw-desc">Built around living books, narration, nature journaling, copywork, and the belief that education is an atmosphere, a discipline, a life. Entries reference CM practices by name. Choose this if your days look like nature walks, read-alouds, and copywork rather than textbooks and worksheets.</div>
+      </div>
+
+      <div class="fw-item philosophy">
+        <div class="fw-tag philosophy">Homeschool Philosophy</div>
+        <div class="fw-name">Classical Trivium</div>
+        <div class="fw-desc">Organized around the Grammar, Logic, and Rhetoric stages of development. References the Well-Trained Mind framework and classical subject areas. Choose this if your approach centers on great books, Latin roots, Socratic discussion, and building a life of the mind.</div>
+      </div>
+
+      <div class="fw-item philosophy">
+        <div class="fw-tag philosophy">Homeschool Philosophy</div>
+        <div class="fw-name">Montessori Developmental Framework</div>
+        <div class="fw-desc">References Montessori planes of development and curriculum areas — Practical Life, Sensorial, Language, Mathematics, Cultural. Entries use authentic Montessori vocabulary. Choose this if your child's learning is self-directed, hands-on, and environment-centered.</div>
+      </div>
+
+      <div class="fw-item international">
+        <div class="fw-tag international">International</div>
+        <div class="fw-name">International Baccalaureate — IB PYP / MYP</div>
+        <div class="fw-desc">References IB transdisciplinary themes, Learner Profile attributes, and Approaches to Learning. Choose this if you are working toward IB enrollment, living internationally, or want a globally recognized framework with strong inquiry-based language.</div>
+      </div>
+
+      <div class="fw-item international">
+        <div class="fw-tag international">International</div>
+        <div class="fw-name">Cambridge Primary & Lower Secondary</div>
+        <div class="fw-desc">References Cambridge curriculum frameworks with specific learning objectives and strands. Choose this if you are following a Cambridge curriculum, living abroad, or want a structured UK-based academic framework.</div>
+      </div>
+
+      <div class="fw-item wholechild">
+        <div class="fw-tag wholechild">Whole Child</div>
+        <div class="fw-name">CASEL — Social & Emotional Learning</div>
+        <div class="fw-desc">Maps learning to CASEL's five core competencies: Self-Awareness, Self-Management, Social Awareness, Relationship Skills, and Responsible Decision-Making. Choose this to document the social and emotional dimensions of your child's growth — conflict resolution, empathy, persistence, and character.</div>
+      </div>
+
+      <div class="fw-item wholechild">
+        <div class="fw-tag wholechild">Whole Child</div>
+        <div class="fw-name">21st Century Learning — P21 Framework</div>
+        <div class="fw-desc">Centers the 4Cs — Critical Thinking, Communication, Collaboration, and Creativity — alongside Life and Career Skills. Choose this to document your child's real-world readiness and transferable skills, especially for older students.</div>
+      </div>
+
+      <div class="fw-item wholechild">
+        <div class="fw-tag wholechild">Whole Child</div>
+        <div class="fw-name">United Nations Sustainable Development Goals</div>
+        <div class="fw-desc">Maps everyday activities to the 17 UN SDGs with global citizenship framing. Choose this if your family's learning is oriented around environmental stewardship, social justice, community, and planetary responsibility.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr>
+
+  <p style="font-size:0.93rem; color:#8a7a62; font-style:italic; text-align:center;">Questions or feedback? We'd love to hear from you at <a href="mailto:info@learningcircles.net">info@learningcircles.net</a></p>
+
+</main>
+
+<footer>
+  Field Notes Portfolio Builder &nbsp;·&nbsp;
+  A <a href="https:/

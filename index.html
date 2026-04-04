@@ -1381,6 +1381,8 @@ footer a:hover { text-decoration: underline; }
       <div class="header-nav-links">
         <a href="https://learningcircles-field-notes.netlify.app/field-notes-about">About this tool</a>
         <span class="nav-sep">·</span>
+        <a href="https://learningcircles-field-notes.netlify.app/field-notes-guide">How to use →</a>
+        <span class="nav-sep">·</span>
         <a href="https://www.paypal.com/ncp/payment/DWRNLJWWM4T2G" target="_blank" rel="noopener">Help it grow →</a>
       </div>
       <a href="https://legislature.maine.gov/statutes/20-A/title20-Asec5001-A.html" target="_blank" rel="noopener" class="maine-mark">
@@ -1408,13 +1410,17 @@ footer a:hover { text-decoration: underline; }
       <label>Standards Framework</label>
       <select id="framework">
         <option value="us">United States Standards (Common Core + Next Generation Science)</option>
+        <option value="cm">Charlotte Mason</option>
+        <option value="trivium">Classical Trivium (Grammar · Logic · Rhetoric)</option>
+        <option value="montessori">Montessori Developmental Framework</option>
         <option value="ib">International Baccalaureate — IB PYP / MYP</option>
         <option value="cambridge">Cambridge Primary &amp; Lower Secondary</option>
-        <option value="montessori">Montessori Developmental Framework</option>
-        <option value="trivium">Classical Trivium (Grammar · Logic · Rhetoric)</option>
+        <option value="casel">CASEL — Social &amp; Emotional Learning</option>
+        <option value="p21">21st Century Learning (P21 Framework)</option>
         <option value="sdg">United Nations Sustainable Development Goals (SDGs)</option>
       </select>
       <span class="framework-note">Choose the framework that best fits your family's approach. The tool maps your activities to that framework's standards.</span>
+      <span class="framework-note">Changing the framework only affects new entries — entries you've already mapped or saved won't change.</span>
     </div>
 
     <!-- Grade / Name -->
@@ -1453,6 +1459,7 @@ footer a:hover { text-decoration: underline; }
           <span>Add a photo</span>
         </button>
         <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
+        <a href="field-notes-guide.html#photo" target="_blank" rel="noopener" style="font-size:0.76rem;color:#8a7a62;font-style:italic;text-decoration:none;border-bottom:1px solid rgba(138,122,98,0.3);white-space:nowrap;transition:color 0.15s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='#8a7a62'">What's this?</a>
       </div>
       <div class="voice-status" id="voiceStatus"></div>
 
@@ -1532,6 +1539,7 @@ footer a:hover { text-decoration: underline; }
   <div class="saved-pad" id="savedPad">
     <h3>Saved Entries This Session</h3>
     <p class="pad-sub">Copy individually, all at once, or paste directly into your portfolio document.</p>
+    <p class="pad-sub">We recommend copying your entries into your portfolio document when you're ready — this tab holds your work, but closing it or returning later will start a fresh session.</p>
     <div class="pad-action-row">
       <button class="btn-rust" onclick="copyAllSaved()">Copy All Entries</button>
       <button class="btn-ghost" onclick="clearSaved()">Clear All</button>
@@ -1589,25 +1597,37 @@ const FRAMEWORKS = {
     name: 'United States Standards (Common Core + Next Generation Science)',
     instruction: 'Use real Common Core State Standards (CCSS) codes for ELA and Math (e.g. CCSS.ELA-LITERACY.RL.3.1, CCSS.MATH.CONTENT.4.MD.A.1), Next Generation Science Standards (NGSS) codes for Science (e.g. NGSS 3-LS1-1), and C3 Framework codes for Social Studies. Use SHAPE America standards for PE, and ISTE standards for Computer Proficiency.'
   },
-  ib: {
-    name: 'International Baccalaureate — IB PYP / MYP',
-    instruction: 'Reference IB Primary Years Programme (PYP) transdisciplinary themes for grades K–5, and IB Middle Years Programme (MYP) subject group objectives for grades 6–10. Use real IB language: Approaches to Learning (ATL), IB Learner Profile attributes, and transdisciplinary themes.'
-  },
-  cambridge: {
-    name: 'Cambridge Primary & Lower Secondary',
-    instruction: 'Reference Cambridge Primary (ages 5–11) and Cambridge Lower Secondary (ages 11–14) curriculum frameworks with real Cambridge learning objectives, strands, and sub-strands.'
-  },
-  montessori: {
-    name: 'Montessori Developmental Framework',
-    instruction: 'Reference Montessori developmental planes and curriculum areas: Practical Life, Sensorial, Language, Mathematics, Cultural. Reference the appropriate plane of development and connect to Montessori principles like the prepared environment and sensitive periods.'
+  cm: {
+    name: 'Charlotte Mason',
+    instruction: 'Use authentic Charlotte Mason language and practices. Reference her six volumes and the AmblesideOnline or Simply Charlotte Mason curricula where relevant. Key practices to draw from: narration (oral or written retelling), copywork and dictation, nature journaling and nature study, living books (as opposed to dry textbooks), picture study, composer study, handicrafts, habit training, and short lessons. Reference Charlotte Mason\'s principle that "education is an atmosphere, a discipline, a life." Frame entries in terms of the child\'s living encounter with ideas, nature, and beauty. Avoid dry academic language — Charlotte Mason entries should feel like field notes from a rich, unhurried day. Identify which CM practice or principle the activity exemplifies.'
   },
   trivium: {
     name: 'Classical Trivium (Grammar · Logic · Rhetoric)',
-    instruction: 'Reference the Classical Trivium stages: Grammar stage (ages 4–11, absorbing foundational knowledge), Logic stage (ages 11–14, analytical thinking), Rhetoric stage (ages 14–18, articulating and defending knowledge). Reference classical subject areas and the Well-Trained Mind framework.'
+    instruction: 'Reference the Classical Trivium stages: Grammar stage (ages 4–11, absorbing foundational knowledge through memory, pattern, and wonder), Logic stage (ages 11–14, analytical thinking, cause-and-effect, argument), Rhetoric stage (ages 14–18, articulating and defending knowledge persuasively). Reference classical subject areas and the Well-Trained Mind framework by Susan Wise Bauer. Use classical education vocabulary: dialectic, Socratic discussion, the Great Books, primary sources, Latin roots where relevant. Frame the entry in terms of which stage the child is in and how the activity develops classical virtues or the life of the mind.'
+  },
+  montessori: {
+    name: 'Montessori Developmental Framework',
+    instruction: 'Reference Montessori developmental planes and curriculum areas: Practical Life, Sensorial, Language, Mathematics, Cultural. Reference the appropriate plane of development (First Plane: birth–6, Second Plane: 6–12, Third Plane: 12–18) and connect to Montessori principles like the prepared environment, the absorbent mind, sensitive periods, and intrinsic motivation. Use authentic Montessori vocabulary: work (not play), normalization, the three-period lesson, control of error, independence. Frame the entry in terms of what the child chose, how long they stayed with it, and what inner development it served.'
+  },
+  ib: {
+    name: 'International Baccalaureate — IB PYP / MYP',
+    instruction: 'Reference IB Primary Years Programme (PYP) transdisciplinary themes for grades K–5, and IB Middle Years Programme (MYP) subject group objectives for grades 6–10. Use real IB language: Approaches to Learning (ATL), IB Learner Profile attributes (inquirer, knowledgeable, thinker, communicator, principled, open-minded, caring, risk-taker, balanced, reflective), and transdisciplinary themes (Who We Are, Where We Are in Place and Time, How We Express Ourselves, How the World Works, How We Organize Ourselves, Sharing the Planet).'
+  },
+  cambridge: {
+    name: 'Cambridge Primary & Lower Secondary',
+    instruction: 'Reference Cambridge Primary (ages 5–11) and Cambridge Lower Secondary (ages 11–14) curriculum frameworks with real Cambridge learning objectives, strands, and sub-strands. Use Cambridge\'s subject-specific frameworks for English, Mathematics, Science, Global Perspectives, and other relevant subjects. Reference Cambridge\'s emphasis on learner attributes: confident, responsible, reflective, innovative, engaged.'
+  },
+  casel: {
+    name: 'CASEL — Social & Emotional Learning',
+    instruction: 'Map the activity to one or more of the five CASEL core competency areas: Self-Awareness (recognizing emotions, values, strengths, and limitations), Self-Management (regulating emotions, setting goals, persisting through challenges), Social Awareness (empathy, understanding others\' perspectives, appreciating diversity), Relationship Skills (communicating clearly, cooperating, resolving conflict, building trust), and Responsible Decision-Making (making ethical, constructive choices about personal and social behavior). Reference the specific CASEL competency by name. Frame the portfolio entry in terms of observable social-emotional behaviors and growth — what the child demonstrated, navigated, or practiced. Use warm, specific language grounded in what was described. CASEL entries should feel like genuine observations of character and relationship, not academic assessments.'
+  },
+  p21: {
+    name: '21st Century Learning (P21 Framework)',
+    instruction: 'Map the activity to the P21 Framework for 21st Century Learning. The four core Cs are: Critical Thinking (analyzing information, solving problems, making reasoned judgments), Communication (articulating thoughts clearly in multiple forms — written, oral, visual, digital), Collaboration (working effectively with others, shared responsibility, flexibility), and Creativity (generating new ideas, innovating, taking creative risks). Also reference P21 Life and Career Skills where relevant: flexibility and adaptability, initiative and self-direction, social and cross-cultural skills, productivity and accountability, leadership and responsibility. Frame entries in terms of real-world readiness and transferable skills. Identify which of the 4Cs (or Life/Career Skills) the activity developed and how.'
   },
   sdg: {
     name: 'United Nations Sustainable Development Goals',
-    instruction: 'Map the activity to one or more of the 17 UN SDGs with full goal name and number (e.g. "SDG 4: Quality Education"). Describe which specific SDG target it supports. Frame in terms of contribution and global citizenship.'
+    instruction: 'Map the activity to one or more of the 17 UN SDGs with full goal name and number (e.g. "SDG 4: Quality Education"). Describe which specific SDG target it supports. Frame in terms of contribution and global citizenship. Connect the child\'s everyday actions to global patterns and responsibilities. Use accessible, values-grounded language that honors both the local activity and its planetary relevance.'
   }
 };
 
@@ -1739,10 +1759,17 @@ function renderPhotoPreviews() {
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let isListening = false;
+let userStoppedVoice = false;
 
 function toggleVoice() {
   if (!SpeechRecognition) { showVoiceStatus('Voice input is not supported in this browser. Try Chrome.', true); return; }
-  if (isListening) { try { recognition.stop(); } catch(e) {} return; }
+  if (isListening) {
+    userStoppedVoice = true;
+    isListening = false;
+    try { recognition.stop(); } catch(e) {}
+    return;
+  }
+  userStoppedVoice = false;
   recognition = new SpeechRecognition();
   recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
   let committed = document.getElementById('activityInput').value.trim();
@@ -1763,7 +1790,7 @@ function toggleVoice() {
     showVoiceStatus(msgs[event.error] || ('Voice error: ' + event.error), true);
   };
   recognition.onend = () => {
-    if (isListening) { try { recognition.start(); return; } catch(e) {} }
+    if (isListening && !userStoppedVoice) { try { recognition.start(); return; } catch(e) {} }
     isListening = false; setVoiceListening(false);
   };
   try { recognition.start(); } catch(e) { showVoiceStatus('Could not start microphone.', true); }
@@ -2064,6 +2091,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
+// ── SESSION GUARD ─────────────────────────────────────────────────────────────
+window.addEventListener('beforeunload', (e) => {
+  if (savedEntries.length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
 
 </script>
 <footer>
